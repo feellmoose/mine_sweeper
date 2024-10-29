@@ -1,7 +1,7 @@
-package com.qingyou;
+package fun.feellmoose;
 
-import com.qingyou.cli.GameCli;
-import com.qingyou.core.Game;
+import fun.feellmoose.cli.GameCli;
+import fun.feellmoose.core.Game;
 
 public class Main {
 

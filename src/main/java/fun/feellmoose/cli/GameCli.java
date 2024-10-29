@@ -1,8 +1,8 @@
-package com.qingyou.cli;
+package fun.feellmoose.cli;
 
-import com.qingyou.core.IGame;
-import com.qingyou.core.IUnit;
-import com.qingyou.core.Step;
+import fun.feellmoose.core.IGame;
+import fun.feellmoose.core.IUnit;
+import fun.feellmoose.core.Step;
 
 import java.util.List;
 import java.util.Scanner;
