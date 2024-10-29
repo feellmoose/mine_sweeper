@@ -1,4 +1,4 @@
-package com.qingyou.core;
+package fun.feellmoose.core;
 
 import java.time.LocalDateTime;
 import java.util.*;

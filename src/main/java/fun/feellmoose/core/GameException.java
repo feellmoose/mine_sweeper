@@ -1,4 +1,4 @@
-package com.qingyou.core;
+package fun.feellmoose.core;
 
 public class GameException extends RuntimeException {
     public GameException(String msg) {

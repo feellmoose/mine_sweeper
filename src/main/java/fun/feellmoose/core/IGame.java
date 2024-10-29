@@ -1,4 +1,4 @@
-package com.qingyou.core;
+package fun.feellmoose.core;
 
 import java.util.List;
 
