@@ -1,5 +1,6 @@
 package fun.feellmoose.cli;
 
+import fun.feellmoose.core.Game;
 import fun.feellmoose.core.IGame;
 import fun.feellmoose.core.IUnit;
 import fun.feellmoose.core.Step;
@@ -8,24 +9,52 @@ import java.util.List;
 import java.util.Scanner;
 
 public class GameCli {
-    public static void start(IGame game) {
-        Scanner scanner = new Scanner(System.in);
 
-        do {
-            System.out.println("--------------------");
-            for (IUnit[] unit : game.units()) {
-                for (IUnit iUnit : unit) {
-                    int num = iUnit.getFilteredNum();
+    public static void print(IGame game){
+        System.out.println("--------------------");
+        for (IUnit[] unit : game.units()) {
+            for (IUnit iUnit : unit) {
+                int num = iUnit.getFilteredNum();
+                switch (num) {
+                    case -2 -> System.out.print("F ");
+                    case -1 -> System.out.print(". ");
+                    default -> System.out.print(num + " ");
+                }
+
+            }
+            System.out.print("\n");
+        }
+        System.out.println("--------------------");
+    }
+
+    public static void printMines(IGame game){
+        if (game.status() != IGame.Status.End) return;
+        System.out.println("--------------------");
+        IUnit[][] units = game.units();
+        List<Step> mines = game.mines();
+        for (int i = 0; i < units.length; i++) {
+            for (int j = 0; j < units[i].length; j++) {
+                if (mines.contains(new Step(i,j))) {
+                    System.out.print("* ");
+                } else {
+                    int num = units[i][j].getFilteredNum();
                     switch (num) {
                         case -2 -> System.out.print("F ");
                         case -1 -> System.out.print(". ");
                         default -> System.out.print(num + " ");
                     }
-
                 }
-                System.out.print("\n");
             }
-            System.out.println("--------------------");
+            System.out.print("\n");
+        }
+        System.out.println("--------------------");
+    }
+
+    public static void start(IGame game) {
+        Scanner scanner = new Scanner(System.in);
+
+        do {
+            GameCli.print(game);
             System.out.println("1. Type 'd' to dig hole.");
             System.out.println("2. Type 'f' add flag.");
             System.out.println("3. Type 'q' to quit.");
@@ -50,27 +79,7 @@ public class GameCli {
                 }
             }
         } while (game.status() != IGame.Status.End);
-
-        System.out.println("--------------------");
-        IUnit[][] units = game.units();
-        List<Step> mines = game.mines();
-        for (int i = 0; i < units.length; i++) {
-            for (int j = 0; j < units[i].length; j++) {
-                if (mines.contains(new Step(i,j))) {
-                    System.out.print("* ");
-                } else {
-                    int num = units[i][j].getFilteredNum();
-                    switch (num) {
-                        case -2 -> System.out.print("F ");
-                        case -1 -> System.out.print(". ");
-                        default -> System.out.print(num + " ");
-                    }
-                }
-            }
-            System.out.print("\n");
-        }
-        System.out.println("--------------------");
-
+        GameCli.printMines(game);
         if (game.isWin()) System.out.println("You win!");
         else System.out.println("You lose!");
     }
