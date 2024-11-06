@@ -64,7 +64,7 @@ public class MainWindow extends JWindow {
                         game.onTyped(finalI, finalJ);
                     }
                 });
-                button.setSize(window.width/game.units()[0].length, window.height/game.units()[0].length);
+                button.setSize(window.width/game.units().length, window.height/game.units()[0].length);
                 button.setVisible(true);
                 control.add(button);
                 window.buttons[i][j] = button;
