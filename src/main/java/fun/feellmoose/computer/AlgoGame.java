@@ -3,6 +3,7 @@ package fun.feellmoose.computer;
 import fun.feellmoose.core.Game;
 import fun.feellmoose.core.IGame;
 import fun.feellmoose.core.Step;
+import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
