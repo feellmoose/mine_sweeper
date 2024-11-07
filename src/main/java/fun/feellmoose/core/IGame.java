@@ -3,18 +3,26 @@ package fun.feellmoose.core;
 import java.util.List;
 
 public interface IGame {
-    IUnit[][] units();  // 获取单元格
-    List<Step> steps();  // 历史记录
-    List<Step> mines();  // 获取雷   游戏结束调用
-    List<Step> flags();  // 获取哪些插过旗
+    int width();
+    int height();
+    IUnit[][] units();
+    List<Step> steps();
+    List<Step> mines();
+    List<Step> flags();
+    int typed();
+    int unknown();
+    int last();
 
-    boolean onTyped(int x, int y);  // 普通点击
+    boolean onTyped(int x, int y);
 
-    boolean onFlag(int x, int y);  // 插旗
+    boolean onFlag(int x, int y);
 
-    Status status();  // 游戏状态
+    Status status();
 
-    boolean isWin();  // 游戏是否胜利
+    boolean isWin();
+
+
+
 
     enum Status {
         Init, Running, End

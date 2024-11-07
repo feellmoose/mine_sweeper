@@ -29,8 +29,8 @@ public class Game implements IGame {
         this.units = new Unit[width][height];
         Random random = ThreadLocalRandom.current();
         for (int temp = mines; temp > 0; ) {
-            int x = random.nextInt(width);
-            int y = random.nextInt(height);
+            int x = random.nextInt(width - 1);
+            int y = random.nextInt(height - 1);
             if (!blocks[x][y]) {
                 blocks[x][y] = true;
                 this.mines.add(new Step(x, y));
@@ -73,6 +73,16 @@ public class Game implements IGame {
     }
 
     @Override
+    public int width() {
+        return this.width;
+    }
+
+    @Override
+    public int height() {
+        return this.height;
+    }
+
+    @Override
     public IUnit[][] units() {
         return this.units;
     }
@@ -91,6 +101,21 @@ public class Game implements IGame {
     @Override
     public List<Step> flags() {
         return flags.stream().toList();
+    }
+
+    @Override
+    public int typed() {
+        return this.typed;
+    }
+
+    @Override
+    public int last() {
+        return mines.size() - flags.size();
+    }
+
+    @Override
+    public int unknown() {
+        return sum - flags.size() - typed;
     }
 
     @Override
@@ -117,7 +142,7 @@ public class Game implements IGame {
                     return false;
                 }
                 u.setStatus(IUnit.Status.Typed);
-                typed ++;
+                typed++;
                 if (u.num() == 0) typedZeroFrom(x, y);
             }
             case Flag, Typed -> {
@@ -145,7 +170,7 @@ public class Game implements IGame {
                     Unit u = units[sx][sy];
                     if (u.status() == IUnit.Status.None && !u.isMine()) {
                         u.setStatus(IUnit.Status.Typed);
-                        typed ++;
+                        typed++;
                         if (u.num() == 0) {
                             Step up = new Step(sx - 1, sy);
                             Step down = new Step(sx + 1, sy);
