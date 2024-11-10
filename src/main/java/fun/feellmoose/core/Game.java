@@ -1,8 +1,10 @@
 package fun.feellmoose.core;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 public class Game implements IGame {
     private final int width;
@@ -12,10 +14,12 @@ public class Game implements IGame {
     private final List<Step> steps;
     private final List<Step> mines;
     private final Set<Step> flags;
+    private final List<Consumer<Boolean>> endHandle = new ArrayList<>();
 
     private Status status = Status.Init;
     private int typed = 0;
     private LocalDateTime start;
+    private Duration duration;
 
     private Game(int width, int height, int mines) {
         this.width = width;
@@ -129,6 +133,19 @@ public class Game implements IGame {
     }
 
     @Override
+    public boolean onEnd(Consumer<Boolean> consumer) {
+        return endHandle.add(consumer);
+    }
+
+    @Override
+    public Duration time() {
+        if (this.status == Status.Init || start == null) return Duration.ZERO;
+        if (status == Status.Running) duration = Duration.between(start, LocalDateTime.now());
+        if (duration == null) return Duration.ZERO;
+        return duration;
+    }
+
+    @Override
     public boolean onTyped(int x, int y) {
         if (!check(width, height, x, y)) return false;
         if (refreshStatus()) return false;
@@ -218,7 +235,10 @@ public class Game implements IGame {
                 yield true;
             }
             case Running -> true;
-            case End -> false;
+            case End -> {
+                endHandle.forEach(consumer -> consumer.accept(isWin()));
+                yield false;
+            }
         };
     }
 

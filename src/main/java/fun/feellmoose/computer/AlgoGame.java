@@ -3,6 +3,7 @@ package fun.feellmoose.computer;
 import fun.feellmoose.core.Game;
 import fun.feellmoose.core.IGame;
 import fun.feellmoose.core.Step;
+import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +24,16 @@ public class AlgoGame implements Algo {
         return this;
     }
 
-    public void start(Game game) {
+    @SneakyThrows
+    public void start(IGame game) {
         while (game.status() != IGame.Status.End) {
+            Thread.sleep(50);
             Step step = this.resolve(game);
             if (step == null) break;
         }
     }
 
-    public Usage startWithUsage(Game game) {
+    public Usage startWithUsage(IGame game) {
         this.usage = Usage.init(algoList.size());
         while (game.status() != IGame.Status.End) {
             Step step = this.resolveWithUsage(game,usage);
@@ -40,7 +43,7 @@ public class AlgoGame implements Algo {
     }
 
     @Override
-    public Step resolve(Game game) {
+    public Step resolve(IGame game) {
         if (game.status() == IGame.Status.End) return null;
         if (game.status() == IGame.Status.Init) {
             Step step = Step.random(game.width(), game.height());
@@ -53,7 +56,7 @@ public class AlgoGame implements Algo {
         return null;
     }
 
-    private Step resolveWithUsage(Game game, Usage usage) {
+    private Step resolveWithUsage(IGame game, Usage usage) {
         if (game.status() == IGame.Status.End) return null;
         if (game.status() == IGame.Status.Init) {
             Step step = Step.random(game.width(), game.height());

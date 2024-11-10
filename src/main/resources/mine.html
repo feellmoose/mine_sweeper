@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mine_sweeper</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #menu-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #ffffff;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #menu-icon {
+            user-select: none;
+            font-size: 24px;
+            color: #333;
+        }
+
+        #dropdown-menu {
+            user-select: none;
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            width: 200px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            visibility: hidden;
+            opacity: 0;
+            z-index: 5;
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+            transform: translateY(-10px);
+        }
+
+        #dropdown-menu.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #dropdown-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #dropdown-menu li {
+            font-weight: bold;
+            color: #333;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #dropdown-menu li:last-child {
+            border-bottom: none;
+        }
+
+        #dropdown-menu a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        #dropdown-menu a:hover {
+            background-color: #ffffff;
+        }
+
+        #info-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            box-sizing: border-box;
+        }
+
+        .info-division-line {
+            margin: 10px auto;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to left, #ffffff, #b6b6b6, #ffffff);
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+        }
+
+        .info-item span {
+            font-weight: bold;
+            color: #333;
+        }
+
+
+
+
+        .modal {
+            user-select: none;
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .modal-content button{
+            width: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            font-weight: bold;
+            border-width: 0;
+            margin: 10px;
+            font-size: 17px;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<div id="menu-panel">
+    <div id="menu-icon">☰</div>
+</div>
+<div id="dropdown-menu">
+    <ul>
+        <li><a href="javascript:void(0);" class="menu-item" data-modal="modal0">Restart</a></li>
+        <li><a href="javascript:void(0);" class="menu-item" data-modal="modal1">Difficulty</a></li>
+        <li><a href="javascript:void(0);" class="menu-item" data-modal="modal2">Back</a></li>
+    </ul>
+</div>
+
+<div id="modal0" class="modal">
+    <div class="modal-content">
+        <span class="close" data-modal="modal0">&times;</span>
+        <span>Are you sure?</span><button>Yes</button>
+    </div>
+</div>
+
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <span class="close" data-modal="modal1">&times;</span>
+        <button>Easy</button><span>|</span><button>Middle</button><span>|</span><button>Hard</button>
+    </div>
+</div>
+
+<div id="modal2" class="modal">
+    <div class="modal-content">
+        <span class="close" data-modal="modal2">&times;</span>
+        <span>Are you sure?</span><button>Yes</button>
+    </div>
+</div>
+
+
+<div id="info-panel">
+    <div class="info-item">
+        <span>Game: </span><span id="game-name">mine_sweeper</span>
+    </div>
+    <div class="info-item">
+        <span>Room: </span><span id="game-room">112312321</span>
+    </div>
+    <div class="info-item">
+        <span>Mode: </span><span id="game-mode">sweep</span>
+    </div>
+
+
+    <div class="info-division-line"></div>
+
+
+    <div class="info-item">
+        <span>Zoom Level: </span><span id="zoom-level">1x</span>
+    </div>
+    <div class="info-item">
+        <span>Location x: </span><span id="location-x">0</span>
+        <span>y: </span><span id="location-y">0</span>
+    </div>
+    <div class="info-item">
+        <span>Game time: </span><span id="game-time">0:00</span>
+    </div>
+    <div class="info-item">
+        <span>Mines count: </span><span id="mine-count">0</span>
+    </div>
+    <div class="info-item">
+        <span>Remaining mines: </span><span id="remaining-mines">-</span>
+    </div>
+
+
+    <div class="info-division-line"></div>
+
+
+    <div class="info-item">
+        <span>History: </span><span id="game-history"></span>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+
+    const menu = document.getElementById('menu-panel');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    menu.addEventListener('click', function() {
+        dropdownMenu.classList.toggle('show');
+    });
+    menu.addEventListener('mouseenter', function() {
+        dropdownMenu.classList.add('show');
+    });
+    menu.addEventListener('mouseleave', function() {
+        setTimeout(() => {
+            if (!dropdownMenu.matches(':hover')) {
+                dropdownMenu.classList.remove('show');
+            }
+        }, 100);
+    });
+    dropdownMenu.addEventListener('mouseenter', function() {
+        dropdownMenu.classList.add('show');
+    });
+    dropdownMenu.addEventListener('mouseleave', function() {
+        dropdownMenu.classList.remove('show');
+    });
+
+    const ctx = canvas.getContext("2d");
+
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        drawMap();
+    }
+
+
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal');
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    });
+    const closeButtons = document.querySelectorAll('.close');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal');
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none'
+            document.body.style.overflow = '';
+        });
+    });
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal')) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+            document.body.style.overflow = '';
+        }
+    });
+
+
+    window.addEventListener('resize', resizeCanvas);
+
+    let zoom = 1;
+
+    const gridSize = 50;
+    const rows = 9;
+    const cols = 9;
+
+    let minefield = [];
+    let revealed = Array.from({ length: rows }, () => Array(cols).fill(false));
+
+    let offsetX = 0;
+    let offsetY = 0;
+
+
+    function drawMap() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const x = col * gridSize * zoom + offsetX;
+                const y = row * gridSize * zoom + offsetY;
+
+                ctx.beginPath();
+                ctx.rect(x, y, gridSize * zoom, gridSize * zoom);
+                ctx.strokeStyle = "#ccc";
+                ctx.stroke();
+
+                if (revealed[row][col]) {
+                    ctx.fillStyle = minefield[row] && minefield[row][col] === "mine" ? "red" : "lightgray";
+                    ctx.fill();
+                }
+            }
+        }
+    }
+
+    canvas.addEventListener("wheel", function(event) {
+        event.preventDefault();
+        const prevZoom = zoom;
+        const zoomFactor = event.deltaY < 0 ? 2.0 : 0.5;
+        zoom = Math.max(0.01, Math.min(zoom * zoomFactor, 5));
+
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+
+        const worldX = (mouseX - offsetX) / prevZoom;
+        const worldY = (mouseY - offsetY) / prevZoom;
+
+        offsetX = mouseX - worldX * zoom;
+        offsetY = mouseY - worldY * zoom;
+
+        document.getElementById("zoom-level").innerText = `${Math.round(zoom * 10) / 10}x`;
+        drawMap();
+    });
+
+    let isDragging = false;
+    let startX, startY;
+
+    canvas.addEventListener("mousedown", function(event) {
+        isDragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+    });
+
+    canvas.addEventListener("mousemove", function(event) {
+        if (isDragging) {
+            const dx = event.clientX - startX;
+            const dy = event.clientY - startY;
+            offsetX += dx;
+            offsetY += dy;
+            startX = event.clientX;
+            startY = event.clientY;
+
+            document.getElementById("location-x").innerText = ` ${(-offsetX / 100).toFixed(2)} `;
+            document.getElementById("location-y").innerText = ` ${(offsetY / 100).toFixed(2)} `;
+
+            drawMap();
+        }
+    });
+
+    canvas.addEventListener("mouseup", function() {
+        isDragging = false;
+    });
+
+    resizeCanvas();
+
+</script>
+
+</body>
+</html>
