@@ -1,6 +1,8 @@
 package fun.feellmoose.core;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface IGame {
     int width();
@@ -21,8 +23,9 @@ public interface IGame {
 
     boolean isWin();
 
+    boolean onEnd(Consumer<Boolean> consumer);
 
-
+    Duration time();
 
     enum Status {
         Init, Running, End

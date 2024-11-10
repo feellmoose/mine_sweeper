@@ -1,6 +1,7 @@
 package fun.feellmoose.computer;
 
 import fun.feellmoose.core.Game;
+import fun.feellmoose.core.IGame;
 import fun.feellmoose.core.IUnit;
 import fun.feellmoose.core.Step;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class DefaultAlgo implements Algo {
     @Override
-    public Step resolve(Game game) {
+    public Step resolve(IGame game) {
         int width = game.width();
         int height = game.height();
         IUnit[][] units = game.units();
@@ -28,7 +29,7 @@ public class DefaultAlgo implements Algo {
         return null;
     }
 
-    private Step around(int width, int height, int x, int y, int[][] temp, Game game) {
+    private Step around(int width, int height, int x, int y, int[][] temp, IGame game) {
         int num = temp[x][y];
         if (num == -1 || num == -2) return null;
         List<Step> nones = new ArrayList<>();

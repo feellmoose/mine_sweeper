@@ -1,6 +1,7 @@
 package fun.feellmoose.computer;
 
 import fun.feellmoose.core.Game;
+import fun.feellmoose.core.IGame;
 import fun.feellmoose.core.IUnit;
 import fun.feellmoose.core.Step;
 
@@ -8,7 +9,7 @@ import java.util.*;
 
 public class HighProbabilityAlgo implements Algo {
     @Override
-    public Step resolve(Game game) {
+    public Step resolve(IGame game) {
         Map<Step, Double> stepProbability = new HashMap<>();
         Map<Step, Integer> stepProbabilityNum = new HashMap<>();
         Step none = null;
