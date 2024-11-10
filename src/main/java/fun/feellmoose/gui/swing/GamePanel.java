@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +95,8 @@ public class GamePanel extends JPanel implements IGame {
                 if (game.isWin()) {
                     temp.drawString("win", 0, 0);
                 } else {
-                    BufferedImage image = ImageIO.read(new File("E:\\my_works\\work_space\\JAVA\\SAST\\mine_sweeper\\src\\main\\resources\\mine.png"));
+                    InputStream stream = getClass().getClassLoader().getResourceAsStream("images/mine.png");
+                    BufferedImage image = ImageIO.read(stream);
                     game.mines().forEach(step -> {
                         temp.setColor(Color.WHITE);
                         temp.drawRect(uw * step.x(), uh * step.y(), uw, uh);
@@ -151,7 +153,8 @@ public class GamePanel extends JPanel implements IGame {
 
     @SneakyThrows
     private static BufferedImage getImage(int n) {
-        return ImageIO.read(new File("E:\\my_works\\work_space\\JAVA\\SAST\\mine_sweeper\\src\\main\\resources\\number-" + n + ".png"));
+        InputStream stream = GamePanel.class.getClassLoader().getResourceAsStream("images/number-" + n + ".png");
+        return ImageIO.read(stream);
     }
 
     private static final Map<Integer, BufferedImage> images = Map.of(
@@ -160,7 +163,8 @@ public class GamePanel extends JPanel implements IGame {
 
     @SneakyThrows
     private BufferedImage getFlagImage() {
-        return ImageIO.read(new File("E:\\my_works\\work_space\\JAVA\\SAST\\mine_sweeper\\src\\main\\resources\\flag.png"));
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("images/flag.png");
+        return ImageIO.read(stream);
     }
 
     @Override

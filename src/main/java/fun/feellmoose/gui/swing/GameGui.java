@@ -8,8 +8,6 @@ import fun.feellmoose.core.Game;
 import fun.feellmoose.core.IGame;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.Timer;
 import java.util.concurrent.*;
 
 public class GameGui extends JFrame {
