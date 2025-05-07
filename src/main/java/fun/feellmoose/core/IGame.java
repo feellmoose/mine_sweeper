@@ -23,8 +23,6 @@ public interface IGame {
 
     boolean isWin();
 
-    boolean onEnd(Consumer<Boolean> consumer);
-
     Duration time();
 
     enum Status {

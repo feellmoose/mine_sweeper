@@ -233,11 +233,6 @@ public class GamePanel extends JPanel implements IGame {
     }
 
     @Override
-    public boolean onEnd(Consumer<Boolean> consumer) {
-        return game.onEnd(consumer);
-    }
-
-    @Override
     public Duration time() {
         return game.time();
     }

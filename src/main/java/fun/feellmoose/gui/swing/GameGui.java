@@ -5,6 +5,7 @@ import fun.feellmoose.computer.DefaultAlgo;
 import fun.feellmoose.computer.HighProbabilityAlgo;
 import fun.feellmoose.computer.RandomAlgo;
 import fun.feellmoose.core.Game;
+import fun.feellmoose.core.GameException;
 import fun.feellmoose.core.IGame;
 
 import javax.swing.*;
@@ -27,7 +28,7 @@ public class GameGui extends JFrame {
         this.panel = panel;
     }
 
-    public static void start() {
+    public static void start() throws GameException {
         GamePanel panel = GamePanel.start(Game.init(9, 9, 10));
 
         GameGui gui = new GameGui(panel);
@@ -48,22 +49,59 @@ public class GameGui extends JFrame {
 
         JMenuBar bar = new JMenuBar();
 
+        // handle and log is better here.
+
         JMenu difficulty = new JMenu("Play");
         JMenuItem easy = new JMenuItem("Easy");
-        easy.addActionListener(e -> restart(Game.init(9, 9, 10)));
+        easy.addActionListener(e -> {
+            try {
+                restart(Game.init(9, 9, 10));
+            } catch (GameException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         JMenuItem medium = new JMenuItem("Medium");
-        medium.addActionListener(e -> restart(Game.init(16, 16, 40)));
+        medium.addActionListener(e -> {
+            try {
+                restart(Game.init(16, 16, 40));
+            } catch (GameException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         JMenuItem hard = new JMenuItem("Hard");
-        hard.addActionListener(e -> restart(Game.init(25, 25, 99)));
-
+        hard.addActionListener(e -> {
+            try {
+                restart(Game.init(25, 25, 99));
+            } catch (GameException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         JMenu auto = new JMenu("Auto");
         JMenuItem easy_auto = new JMenuItem("Easy");
-        easy_auto.addActionListener(e -> auto(Game.init(9, 9, 10)));
+        easy_auto.addActionListener(e -> {
+            try {
+                auto(Game.init(9, 9, 10));
+            } catch (GameException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         JMenuItem medium_auto = new JMenuItem("Medium");
-        medium_auto.addActionListener(e -> auto(Game.init(16, 16, 40)));
+        medium_auto.addActionListener(e -> {
+            try {
+                auto(Game.init(16, 16, 40));
+            } catch (GameException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         JMenuItem hard_auto = new JMenuItem("Hard");
-        hard_auto.addActionListener(e -> auto(Game.init(25, 25, 99)));
+        hard_auto.addActionListener(e -> {
+            try {
+                auto(Game.init(25, 25, 99));
+            } catch (GameException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         difficulty.setVisible(true);
         difficulty.add(easy);

@@ -1,12 +1,18 @@
 package fun.feellmoose.core;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.Nullable;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Game implements IGame {
+    private final String gameID;
     private final int width;
     private final int height;
     private final int sum;
@@ -14,14 +20,14 @@ public class Game implements IGame {
     private final List<Step> steps;
     private final List<Step> mines;
     private final Set<Step> flags;
-    private final List<Consumer<Boolean>> endHandle = new ArrayList<>();
 
     private Status status = Status.Init;
     private int typed = 0;
     private LocalDateTime start;
     private Duration duration;
 
-    private Game(int width, int height, int mines) {
+    private Game(int width, int height, int mines) throws GameException {
+        this.gameID = UUID.randomUUID().toString();
         this.width = width;
         this.height = height;
         this.sum = width * height;
@@ -51,7 +57,7 @@ public class Game implements IGame {
         }
     }
 
-    public static Game init(final int width, final int height, int mineNum) {
+    public static Game init(final int width, final int height, int mineNum) throws GameException {
         return new Game(width, height, mineNum);
     }
 
@@ -133,14 +139,9 @@ public class Game implements IGame {
     }
 
     @Override
-    public boolean onEnd(Consumer<Boolean> consumer) {
-        return endHandle.add(consumer);
-    }
-
-    @Override
     public Duration time() {
         if (this.status == Status.Init || start == null) return Duration.ZERO;
-        if (status == Status.Running) duration = Duration.between(start, LocalDateTime.now());
+        if (status == Status.Running) return Duration.between(start, LocalDateTime.now());
         if (duration == null) return Duration.ZERO;
         return duration;
     }
@@ -156,6 +157,7 @@ public class Game implements IGame {
                 if (u.isMine()) {
                     //Typed mine ... boom! Game is Over.
                     this.status = Status.End;
+                    this.duration = Duration.between(start, LocalDateTime.now());
                     return false;
                 }
                 u.setStatus(IUnit.Status.Typed);
@@ -235,11 +237,67 @@ public class Game implements IGame {
                 yield true;
             }
             case Running -> true;
-            case End -> {
-                endHandle.forEach(consumer -> consumer.accept(isWin()));
-                yield false;
-            }
+            case End -> false;
         };
+    }
+
+    public SerializedGame serialized(){
+        return SerializedGame.serialize(this);
+    }
+
+    public static Game fromSerialized(SerializedGame game){
+        return game.deserialize();
+    }
+
+
+    public record SerializedGame(
+            String gameID,
+            int width,
+            int height,
+            int sum,
+            Unit[][] units,
+            Step[] steps,
+            Step[] mines,
+            Step[] flags,
+            IGame.Status status,
+            int typed,
+            @Nullable LocalDateTime start,
+            @Nullable Duration duration
+    ) {
+
+        public Game deserialize() {
+            return new Game(
+                    gameID,
+                    width,
+                    height,
+                    sum,
+                    units,
+                    Arrays.stream(steps).collect(Collectors.toList()),
+                    Arrays.stream(mines).collect(Collectors.toList()),
+                    Arrays.stream(flags).collect(Collectors.toSet()),
+                    status,
+                    typed,
+                    start,
+                    duration
+            );
+        }
+
+        public static SerializedGame serialize(Game game) {
+            return new SerializedGame(
+                    game.gameID,
+                    game.width,
+                    game.height,
+                    game.sum,
+                    game.units,
+                    game.steps.toArray(new Step[0]),
+                    game.mines.toArray(new Step[0]),
+                    game.flags.toArray(new Step[0]),
+                    game.status,
+                    game.typed,
+                    game.start,
+                    game.duration
+            );
+        }
     }
 
 }
