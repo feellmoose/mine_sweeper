@@ -1,8 +1,9 @@
 package fun.feellmoose.gui.tgbot;
 
 import fun.feellmoose.core.GameException;
-import fun.feellmoose.gui.tgbot.handle.GameChatHandler;
-import fun.feellmoose.gui.tgbot.handle.GameCommand;
+import fun.feellmoose.gui.tgbot.handle.telegram.CallbackQueryHandler;
+import fun.feellmoose.gui.tgbot.handle.telegram.ChatHandler;
+import fun.feellmoose.gui.tgbot.handle.telegram.CommandHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
@@ -24,48 +25,63 @@ public class TelegramBotGame {
     private TelegramBotGame(
             String botToken,
             TelegramClient telegramClient,
-            Collection<GameCommand> commands,
-            Collection<GameChatHandler> chatHandlers
+            Collection<CommandHandler> commands,
+            Collection<CallbackQueryHandler> callbacks,
+            Collection<ChatHandler> chats
     ) {
-        this.botToken = botToken != null ? botToken: System.getenv("BOT_TOKEN");
-        TelegramClient client = telegramClient != null ? telegramClient: new OkHttpTelegramClient(Objects.requireNonNull(botToken));
-        this.gameConsumer = new TelegramGameConsumer(client, commands, chatHandlers);
+        this.botToken = botToken != null ? botToken : System.getenv("BOT_TOKEN");
+        TelegramClient client = telegramClient != null ? telegramClient : new OkHttpTelegramClient(Objects.requireNonNull(botToken));
+        this.gameConsumer = new TelegramGameConsumer(client, commands, callbacks, chats);
     }
 
-    public static TelegramBotGameBuilder builder(){
+    public static TelegramBotGameBuilder builder() {
         return new TelegramBotGameBuilder();
     }
 
     public static class TelegramBotGameBuilder {
         private String botToken;
         private TelegramClient client;
-        private final Collection<GameCommand> commands = new ArrayList<>();
-        private final Collection<GameChatHandler> chatHandlers = new ArrayList<>();
-        private TelegramBotGameBuilder() {}
+        private final Collection<CommandHandler> commands = new ArrayList<>();
+        private final Collection<CallbackQueryHandler> callbacks = new ArrayList<>();
+        private final Collection<ChatHandler> chats = new ArrayList<>();
+
+        private TelegramBotGameBuilder() {
+        }
 
         public TelegramBotGame build() {
             return new TelegramBotGame(
-                    botToken, client, commands, chatHandlers
+                    botToken, client, commands, callbacks, chats
             );
         }
 
-        public TelegramBotGameBuilder registerCommand(GameCommand command){
+        public TelegramBotGameBuilder registerCommandHandler(CommandHandler command) {
             commands.add(command);
             return this;
         }
 
-        public TelegramBotGameBuilder removeCommand(GameCommand command){
+        public TelegramBotGameBuilder removeCommandHandler(CommandHandler command) {
             commands.remove(command);
             return this;
         }
 
-        public TelegramBotGameBuilder registerChatHandler(GameChatHandler chatHandler){
-            chatHandlers.add(chatHandler);
+        public TelegramBotGameBuilder registerCallbackQueryHandler(CallbackQueryHandler callbackQueryHandler) {
+            callbacks.add(callbackQueryHandler);
             return this;
         }
 
-        public TelegramBotGameBuilder removerChatHandler(GameChatHandler chatHandler){
-            chatHandlers.remove(chatHandler);
+        public TelegramBotGameBuilder removerCallbackQueryHandler(CallbackQueryHandler callbackQueryHandler) {
+            callbacks.remove(callbackQueryHandler);
+            return this;
+        }
+
+
+        public TelegramBotGameBuilder registerChatHandler(ChatHandler chatHandler) {
+            chats.add(chatHandler);
+            return this;
+        }
+
+        public TelegramBotGameBuilder removerChatHandler(ChatHandler chatHandler) {
+            chats.remove(chatHandler);
             return this;
         }
 

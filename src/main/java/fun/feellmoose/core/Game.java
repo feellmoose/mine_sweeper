@@ -158,7 +158,7 @@ public class Game implements IGame {
                     //Typed mine ... boom! Game is Over.
                     this.status = Status.End;
                     this.duration = Duration.between(start, LocalDateTime.now());
-                    return false;
+                    return true;
                 }
                 u.setStatus(IUnit.Status.Typed);
                 typed++;
@@ -264,6 +264,10 @@ public class Game implements IGame {
             @Nullable LocalDateTime start,
             @Nullable Duration duration
     ) {
+
+        public boolean isWin() {
+            return status == Status.End && typed + mines.length == sum;
+        }
 
         public Game deserialize() {
             return new Game(

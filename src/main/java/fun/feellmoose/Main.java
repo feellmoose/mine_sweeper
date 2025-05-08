@@ -2,7 +2,10 @@ package fun.feellmoose;
 
 import fun.feellmoose.core.GameException;
 import fun.feellmoose.gui.tgbot.TelegramBotGame;
-import fun.feellmoose.gui.tgbot.handle.SingleGameCommands;
+import fun.feellmoose.gui.tgbot.handle.common.InnerBotCommandHandlers;
+import fun.feellmoose.gui.tgbot.handle.common.SinglePlayerSweeperGameCommandHandler;
+import fun.feellmoose.gui.tgbot.handle.telegram.SingleGameCommandHandlers;
+import fun.feellmoose.gui.tgbot.handle.telegram.SinglePlayerSweeperGameCallbackHandler;
 import fun.feellmoose.muti.GameRepo;
 import fun.feellmoose.muti.MemoryGameRepo;
 import fun.feellmoose.muti.SinglePlayerGameManager;
@@ -23,16 +26,23 @@ public class Main {
         SinglePlayerGameManager gameManager = new SinglePlayerGameManager(repo);
         OkHttpTelegramClient client = new OkHttpTelegramClient(botToken);
 
-        SingleGameCommands singleGameCommands = new SingleGameCommands(gameManager, client);
+
+        InnerBotCommandHandlers innerBotCommandHandlers = new InnerBotCommandHandlers()
+                .register(new SinglePlayerSweeperGameCommandHandler(gameManager, client));
+
+
+        SingleGameCommandHandlers singleGameCommandHandlers = new SingleGameCommandHandlers(innerBotCommandHandlers);
+        SinglePlayerSweeperGameCallbackHandler singlePlayerSweeperGameCallbackHandler = new SinglePlayerSweeperGameCallbackHandler(innerBotCommandHandlers);
 
         log.info("Starting TelegramBot Game..");
 
         TelegramBotGame game = TelegramBotGame.builder()
                 .botToken(botToken)
-                .registerCommand(singleGameCommands.create())
-                .registerCommand(singleGameCommands.flag())
-                .registerCommand(singleGameCommands.dig())
-                .registerCommand(singleGameCommands.quit())
+                .registerCallbackQueryHandler(singlePlayerSweeperGameCallbackHandler)
+                .registerCommandHandler(singleGameCommandHandlers.create())
+                .registerCommandHandler(singleGameCommandHandlers.flag())
+                .registerCommandHandler(singleGameCommandHandlers.dig())
+                .registerCommandHandler(singleGameCommandHandlers.quit())
                 .build();
         try {
             game.start();
