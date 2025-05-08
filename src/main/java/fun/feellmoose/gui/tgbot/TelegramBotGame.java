@@ -4,11 +4,14 @@ import fun.feellmoose.core.GameException;
 import fun.feellmoose.gui.tgbot.handle.GameChatHandler;
 import fun.feellmoose.gui.tgbot.handle.GameCommand;
 import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 @Slf4j
 public class TelegramBotGame {
@@ -17,13 +20,16 @@ public class TelegramBotGame {
     private final TelegramBotsLongPollingApplication application = new TelegramBotsLongPollingApplication();
     private final TelegramGameConsumer gameConsumer;
 
+
     private TelegramBotGame(
             String botToken,
+            TelegramClient telegramClient,
             Collection<GameCommand> commands,
             Collection<GameChatHandler> chatHandlers
     ) {
         this.botToken = botToken != null ? botToken: System.getenv("BOT_TOKEN");
-        this.gameConsumer = new TelegramGameConsumer(commands, chatHandlers);
+        TelegramClient client = telegramClient != null ? telegramClient: new OkHttpTelegramClient(Objects.requireNonNull(botToken));
+        this.gameConsumer = new TelegramGameConsumer(client, commands, chatHandlers);
     }
 
     public static TelegramBotGameBuilder builder(){
@@ -32,13 +38,14 @@ public class TelegramBotGame {
 
     public static class TelegramBotGameBuilder {
         private String botToken;
+        private TelegramClient client;
         private final Collection<GameCommand> commands = new ArrayList<>();
         private final Collection<GameChatHandler> chatHandlers = new ArrayList<>();
         private TelegramBotGameBuilder() {}
 
         public TelegramBotGame build() {
             return new TelegramBotGame(
-                    botToken, commands, chatHandlers
+                    botToken, client, commands, chatHandlers
             );
         }
 
@@ -64,6 +71,11 @@ public class TelegramBotGame {
 
         public TelegramBotGameBuilder botToken(String botToken) {
             this.botToken = botToken;
+            return this;
+        }
+
+        public TelegramBotGameBuilder client(TelegramClient client) {
+            this.client = client;
             return this;
         }
     }
