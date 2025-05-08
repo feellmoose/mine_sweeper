@@ -263,13 +263,13 @@ public class SingleGameCommands {
                     for (IUnit iUnit : unit) {
                         int num = iUnit.getFilteredNum();
                         switch (num) {
-                            case -2 -> System.out.print("F ");
-                            case -1 -> System.out.print(". ");
-                            default -> System.out.print(num + " ");
+                            case -2 -> str.append("F ");
+                            case -1 -> str.append(". ");
+                            default -> str.append(num).append(" ");
                         }
 
                     }
-                    System.out.print("\n");
+                    str.append("\n");
                 }
             }
 
