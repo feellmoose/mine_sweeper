@@ -22,7 +22,7 @@ public class TelegramBotGame {
             Collection<GameCommand> commands,
             Collection<GameChatHandler> chatHandlers
     ) {
-        this.botToken = botToken != null ? botToken: System.getenv("TELEGRAM_BOT_TOKEN");
+        this.botToken = botToken != null ? botToken: System.getenv("BOT_TOKEN");
         this.gameConsumer = new TelegramGameConsumer(commands, chatHandlers);
     }
 

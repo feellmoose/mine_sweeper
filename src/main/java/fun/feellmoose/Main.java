@@ -17,6 +17,8 @@ public class Main {
         log.info("Prepare resource..");
         String botToken = System.getenv("BOT_TOKEN");
 
+        log.debug("Loaded telegram bot token: [{}]", botToken);
+
         GameRepo repo = new MemoryGameRepo();
         SinglePlayerGameManager gameManager = new SinglePlayerGameManager(repo);
         OkHttpTelegramClient client = new OkHttpTelegramClient(botToken);
