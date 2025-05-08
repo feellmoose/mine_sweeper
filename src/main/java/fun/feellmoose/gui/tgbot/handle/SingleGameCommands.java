@@ -1,9 +1,6 @@
 package fun.feellmoose.gui.tgbot.handle;
 
-import fun.feellmoose.core.Game;
-import fun.feellmoose.core.GameException;
-import fun.feellmoose.core.IUnit;
-import fun.feellmoose.core.Step;
+import fun.feellmoose.core.*;
 import fun.feellmoose.muti.SinglePlayerGameManager;
 import kotlin.random.Random;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+
+import java.util.Objects;
 
 @Slf4j
 public class SingleGameCommands {
@@ -214,7 +213,7 @@ public class SingleGameCommands {
 
     private static void displayQuitGame(TelegramClient client, Chat chat, User from) {
         try {
-            String str = "@" + from.getUserName() + "Quit game success";
+            String str = "@" + from.getUserName() + " quit game success";
             client.execute(SendMessage.builder()
                     .chatId(chat.getId())
                     .text(str)
@@ -233,31 +232,47 @@ public class SingleGameCommands {
             str.append("Game state: ").append(game.status()).append("\n");
             str.append("\n");
 
-            IUnit[][] units = game.units();
-            Step[] mines = game.mines();
-            for (int i = 0; i < units.length; i++) {
-                for (int j = 0; j < units[i].length; j++) {
-                    boolean contains = false;
-                    Step step = new Step(i, j);
-                    for (Step mine : mines) {
-                        if (mine.equals(step)) {
-                            contains = true;
-                            break;
+            if (Objects.requireNonNull(game.status()) == IGame.Status.End) {
+                IUnit[][] units = game.units();
+                Step[] mines = game.mines();
+                for (int i = 0; i < units.length; i++) {
+                    for (int j = 0; j < units[i].length; j++) {
+                        boolean contains = false;
+                        Step step = new Step(i, j);
+                        for (Step mine : mines) {
+                            if (mine.equals(step)) {
+                                contains = true;
+                                break;
+                            }
+                        }
+                        if (contains) {
+                            str.append("* ");
+                        } else {
+                            int num = units[i][j].getFilteredNum();
+                            switch (num) {
+                                case -2 -> str.append("F ");
+                                case -1 -> str.append(". ");
+                                default -> str.append(num).append(" ");
+                            }
                         }
                     }
-                    if (contains) {
-                        str.append("* ");
-                    } else {
-                        int num = units[i][j].getFilteredNum();
-                        switch (num) {
-                            case -2 -> str.append("F ");
-                            case -1 -> str.append(". ");
-                            default -> str.append(num).append(" ");
-                        }
-                    }
+                    str.append("\n");
                 }
-                str.append("\n");
+            } else {
+                for (IUnit[] unit : game.units()) {
+                    for (IUnit iUnit : unit) {
+                        int num = iUnit.getFilteredNum();
+                        switch (num) {
+                            case -2 -> System.out.print("F ");
+                            case -1 -> System.out.print(". ");
+                            default -> System.out.print(num + " ");
+                        }
+
+                    }
+                    System.out.print("\n");
+                }
             }
+
             client.execute(SendMessage.builder()
                     .chatId(chat.getId())
                     .text(str.toString())

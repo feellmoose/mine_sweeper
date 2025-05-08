@@ -6,10 +6,13 @@ import fun.feellmoose.gui.tgbot.handle.GameCommand;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,6 +21,7 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 public class TelegramGameConsumer implements LongPollingUpdateConsumer {
+    private final TelegramClient client;
     private final Collection<GameCommand> commands;
     private final Collection<GameChatHandler> chatHandlers;
 
@@ -41,8 +45,16 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
                                 command.handle(chat, from, args);
                         } catch (GameException e) {
                             log.error("Game command execute failed",e);
+                            try {
+                                client.execute(SendMessage.builder()
+                                        .chatId(chat.getId())
+                                        .text(e.getMessage())
+                                        .replyToMessageId(message.getMessageId())
+                                        .build());
+                            } catch (TelegramApiException ex) {
+                                log.error("Sending error message failed",e);
+                            }
                         }
-
                     }
                 } else if ((message.isTopicMessage()
                         || message.isGroupMessage()
@@ -57,11 +69,22 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
                         try {
                             chatHandler.handle(chat, from, words);
                         } catch (GameException e) {
-                            log.error("Game chat command execute failed",e);
+                            log.error("Game command execute failed",e);
+                            try {
+                                client.execute(SendMessage.builder()
+                                        .chatId(chat.getId())
+                                        .text(e.getMessage())
+                                        .replyToMessageId(message.getMessageId())
+                                        .build());
+                            } catch (TelegramApiException ex) {
+                                log.error("Sending error message failed",e);
+                            }
                         }
                     }
                 }
             }
         }
     }
+
+
 }
