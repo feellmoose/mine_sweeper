@@ -59,6 +59,19 @@ public class SingleGameCommands {
         public void handle(Chat chat, User from, String[] args) throws GameException {
             String id = genID(chat, from);
             switch (args.length) {
+                case 1 -> {
+                    try {
+                        client.execute(
+                                SendMessage.builder()
+                                        .chatId(chat.getId())
+                                        .text("Hello world!")
+                                        .build()
+                        );
+                    } catch (TelegramApiException e) {
+                        log.error("Telegram Api hello world error", e);
+                    }
+                    //TODO create with panel
+                }
                 case 2 -> {
                     if (!args[1].equals("random")) throwFormatException();
                     int length = Random.Default.nextInt(1, 40);
@@ -93,7 +106,7 @@ public class SingleGameCommands {
         }
 
         private void throwFormatException() throws GameException {
-            throw new GameException("Command format should be like: '/create random', '/create level $level' or '/create $width:number $height:number $mine:number'");
+            throw new GameException("Command format should be like: '/create', '/create random', '/create level $level' or '/create $width:number $height:number $mine:number'");
         }
 
     }
