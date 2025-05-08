@@ -69,7 +69,10 @@ public class TelegramBotGame {
     }
 
     public void start() throws GameException, TelegramApiException {
-        this.application.registerBot(botToken, gameConsumer);
-        this.application.start();
+        var app = this.application;
+        app.registerBot(botToken, gameConsumer);
+        if (!app.isRunning()) {
+            app.start();
+        }
     }
 }

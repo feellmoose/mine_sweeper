@@ -28,14 +28,24 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Stop bot service
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            sudo systemctl stop mine-sweeper-bot.service || true
+          "
+
       - name: Remove old jar on server
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "rm -f /home/${{ secrets.SSH_USER }}/mine_sweeper_bot.jar"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            rm -f /home/${{ secrets.SSH_USER }}/mine_sweeper_bot.jar
+          "
 
-      - name: Upload jar to server
+      - name: Upload new jar to server
         run: |
           scp target/mine-sweeper-1.0.0.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/mine_sweeper_bot.jar
 
-      - name: Run jar on server
+      - name: Start bot service
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "nohup java -jar mine_sweeper_bot.jar > app.log 2>&1 &"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            sudo systemctl start mine-sweeper-bot.service
+          "
