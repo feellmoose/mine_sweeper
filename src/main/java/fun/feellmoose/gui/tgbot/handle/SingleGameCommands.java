@@ -219,7 +219,7 @@ public class SingleGameCommands {
                     .text(str)
                     .build());
         } catch (TelegramApiException e) {
-            log.error("Error display quit game for user@{} in chat@{}", from.getUserName(), chat.getTitle(), e);
+            log.error("Error display quit game for user @{} in chat@{}", from.getUserName(), chat.getTitle(), e);
         }
     }
 
