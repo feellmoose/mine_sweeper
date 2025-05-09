@@ -108,6 +108,7 @@ public class SinglePlayerSweeperGameDisplay {
 
             IUnit[][] units = game.units();
             Step[] mines = game.mines();
+            Step boom = game.steps()[game.steps().length - 1];
             for (int i = 0; i < units.length; i++) {
                 InlineKeyboardRow row = new InlineKeyboardRow();
                 for (int j = 0; j < units[i].length; j++) {
@@ -119,25 +120,30 @@ public class SinglePlayerSweeperGameDisplay {
                             break;
                         }
                     }
-                    if (contains) {
+                    if (!boom.equals(step)) {
+                        row.add(InlineKeyboardButton.builder()
+                                .text("\uD83D\uDCA5")
+                                .callbackData("empty:%s:%s".formatted(i,j))
+                                .build());
+                    } else if (contains) {
                         row.add(InlineKeyboardButton.builder()
                                 .text("\uD83D\uDCA3")
-                                .callbackData("empty")
+                                .callbackData("empty:%s:%s".formatted(i,j))
                                 .build());
                     } else {
                         int num = units[i][j].getFilteredNum();
                         switch (num) {
                             case -2 -> row.add(InlineKeyboardButton.builder()
                                     .text("\uD83D\uDEA9")
-                                    .callbackData("empty")
+                                    .callbackData("empty:%s:%s".formatted(i,j))
                                     .build());
                             case -1 -> row.add(InlineKeyboardButton.builder()
                                     .text("ㅤ")
-                                    .callbackData("empty")
+                                    .callbackData("empty:%s:%s".formatted(i,j))
                                     .build());
                             default -> row.add(InlineKeyboardButton.builder()
                                     .text(String.valueOf(num))
-                                    .callbackData("empty")
+                                    .callbackData("empty:%s:%s".formatted(i,j))
                                     .build());
                         }
                     }

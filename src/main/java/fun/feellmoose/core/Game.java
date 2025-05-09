@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Game implements IGame {
-    private final String gameID;
+    private String gameID;
     private final int width;
     private final int height;
     private final int sum;
@@ -59,6 +59,65 @@ public class Game implements IGame {
                 );
             }
         }
+    }
+
+    private Game(int width, int height, int mines, int emptyX, int emptyY) throws GameException {
+        this.gameID = UUID.randomUUID().toString();
+        this.width = width;
+        this.height = height;
+        this.sum = width * height;
+        this.steps = new LinkedList<>();
+        this.flags = new HashSet<>();
+        this.mines = new ArrayList<>(mines);
+        if (mines * 2 > sum) throw new GameException("Mines are too many.");
+        boolean[][] blocks = new boolean[width][height];
+        this.units = new Unit[width][height];
+        Random random = ThreadLocalRandom.current();
+        int retry = 100;
+        for (int temp = mines; temp > 0; ) {
+            int x = random.nextInt(width - 1);
+            int y = random.nextInt(height - 1);
+
+            if ((emptyX == x && emptyY == y)
+                    || (emptyX - 1 == x && emptyY == y)
+                    || (emptyX + 1 == x && emptyY == y)
+                    || (emptyX == x && emptyY - 1 == y)
+                    || (emptyX == x && emptyY + 1 == y)) {
+                retry --;
+                if (retry == 0) throw new GameException("Mines are too many.");
+                continue;
+            }
+
+            if (!blocks[x][y]) {
+                blocks[x][y] = true;
+                this.mines.add(new Step(x, y));
+                temp--;
+            }
+        }
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                units[i][j] = Unit.init(
+                        checkAroundAndGetNumber(width, height, i, j, blocks),
+                        blocks[i][j]
+                );
+            }
+        }
+    }
+
+    public static Game initWithClick(Game fake, int x, int y) throws GameException {
+        Game game = new Game(fake.width, fake.height, fake.mines.size(), x, y);
+        game.gameID = fake.gameID;
+        game.flags.addAll(fake.flags);
+        game.onTyped(x, y);
+        return game;
+    }
+
+    public static Game fake(final int width, final int height, int mineNum) throws GameException {
+        Game game = new Game(width, height, 0);
+        for (int i = 0; i < mineNum; i++) {
+            game.mines.add(new Step(-1, -1));
+        }
+        return game;
     }
 
     public static Game init(final int width, final int height, int mineNum) throws GameException {

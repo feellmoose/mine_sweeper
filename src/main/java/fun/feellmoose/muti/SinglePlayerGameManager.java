@@ -2,6 +2,7 @@ package fun.feellmoose.muti;
 
 import fun.feellmoose.core.Game;
 import fun.feellmoose.core.GameException;
+import fun.feellmoose.core.IGame;
 import fun.feellmoose.core.Step;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +42,7 @@ public class SinglePlayerGameManager {
     public Game.SerializedGame create(String userID, String chatID, String messageID, int width, int height, int num) throws GameException {
         lock.lock();
         try {
-            var game = Game.init(width, height, num).serialized();
+            var game = Game.fake(width, height, num).serialized();
             AdditionalGameInfo gameInfo = new AdditionalGameInfo(
                     game.gameID(),
                     game.width() > 8 || game.height() > 8 ? GameType.picture : GameType.button,
@@ -118,7 +119,11 @@ public class SinglePlayerGameManager {
     @NotNull
     public Game.SerializedGame dig(String userID, String chatID, String messageID, String gameID, Step step) throws GameException {
         Game game = queryNotNull(userID,chatID,messageID,gameID).deserialize();
-        game.onTyped(step.x(), step.y());
+        if (game.status() == IGame.Status.Init) {
+            game = Game.initWithClick(game,step.x(),step.y());
+        } else {
+            game.onTyped(step.x(), step.y());
+        }
         var update = game.serialized();
         repo.save(update);
         return update;

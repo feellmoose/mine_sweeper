@@ -77,19 +77,18 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
 
     private void create(String[] args, String userID, String username, String chatID, String messageID) throws GameException, TelegramApiException {
         log.debug("Creating game... {}", Arrays.asList(args));
-        //TODO diff from button and other game
-//        if (gameManager.query(userID, chatID, messageID, null) != null) {
-//            client.execute(
-//                    SendMessage.builder()
-//                            .chatId(chatID)
-//                            .text("""
-//                                    @%s
-//                                    🎮 A game is currently active in this chat!
-//                                    To end it early, type '/quit' or '/admin quit'.
-//                                    """.formatted(username))
-//                            .build()
-//            );
-//        }
+        if (gameManager.query(userID, chatID, null, null) != null) {
+            client.execute(
+                    SendMessage.builder()
+                            .chatId(chatID)
+                            .text("""
+                                    @%s
+                                    🎮 A game is currently active in this chat!
+                                    To end it early, type '/quit' or '/admin quit'.
+                                    """.formatted(username))
+                            .build()
+            );
+        }
         switch (args.length) {
             case 0 -> {
                 //send create guide for user
@@ -106,7 +105,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 var row = new InlineKeyboardRow();
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text("Start classic mod")
+                                .text("Classic Game")
                                 .callbackData("create:8:8:10")
                                 .build()
                 );
@@ -126,7 +125,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                     int length = Random.Default.nextInt(1, 52);
                     double random = Random.Default.nextDouble(0, 1);
                     //filter to limit num smaller
-                    int num = (int) (Math.pow(random, 10) * Math.pow(length, 2));
+                    int num = (int) (Math.pow(random, 10) * Math.pow(length, 2) / 2);
                     Game.SerializedGame game = gameManager.create(userID, chatID, messageID, length, length, num);
                     display.display(game, userID, username, chatID, messageID);
                 }
