@@ -144,7 +144,7 @@ public class SinglePlayerSweeperGameDisplay {
             row.add(
                     InlineKeyboardButton.builder()
                             .text("Try again?")
-                            .callbackData("create:8:8:12")
+                            .callbackData("create:8:8:10")
                             .build()
             );
             keyboard.add(row);

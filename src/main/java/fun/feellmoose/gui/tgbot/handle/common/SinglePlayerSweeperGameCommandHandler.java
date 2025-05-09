@@ -106,7 +106,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 row.add(
                         InlineKeyboardButton.builder()
                                 .text("Start classic mod")
-                                .callbackData("create:8:8:12")
+                                .callbackData("create:8:8:10")
                                 .build()
                 );
                 client.execute(
