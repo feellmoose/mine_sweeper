@@ -14,7 +14,7 @@ public class SinglePlayerGameManager {
     private final Repo<AdditionalGameInfo> additionalRepo;
 
     public record AdditionalGameInfo(
-            Game.SerializedGame game,
+            String gameID,
             GameType type,
             String userID,
             String chatID,
@@ -43,7 +43,7 @@ public class SinglePlayerGameManager {
         try {
             var game = Game.init(width, height, num).serialized();
             AdditionalGameInfo gameInfo = new AdditionalGameInfo(
-                    game,
+                    game.gameID(),
                     game.width() > 8 || game.height() > 8 ? GameType.picture : GameType.button,
                     userID,
                     chatID,
@@ -59,30 +59,60 @@ public class SinglePlayerGameManager {
 
     @Nullable
     public Game.SerializedGame query(String userID, String chatID, String messageID, String gameID) {
-        AdditionalGameInfo additionalGameInfo = additionalRepo.fetch("u%s_c%s_m%s".formatted(userID, chatID, messageID));
-        if (additionalGameInfo != null) return additionalGameInfo.game;
-        additionalGameInfo = additionalRepo.fetch("u%s_c%s".formatted(userID, chatID));
-        if (additionalGameInfo != null) return additionalGameInfo.game;
         if (gameID != null) return repo.fetch(gameID);
+        AdditionalGameInfo additionalGameInfo;
+        if (userID != null && chatID != null && messageID != null) {
+            additionalGameInfo = additionalRepo.fetch("u%s_c%s_m%s".formatted(userID, chatID, messageID));
+            if (additionalGameInfo != null) return repo.fetch(additionalGameInfo.gameID);
+        }
+        if (userID != null && chatID != null) {
+            additionalGameInfo = additionalRepo.fetch("u%s_c%s".formatted(userID, chatID));
+            if (additionalGameInfo != null) return repo.fetch(additionalGameInfo.gameID);
+        }
         return null;
     }
 
     @NotNull
     private Game.SerializedGame queryNotNull(String userID, String chatID, String messageID, String gameID) throws GameException {
-        AdditionalGameInfo additionalGameInfo = null;
+        Game.SerializedGame game = null;
+        if (gameID != null) {
+            game = repo.fetch(gameID);
+            if (game != null) return game;
+        }
+        AdditionalGameInfo additionalGameInfo;
         if (userID != null && chatID != null && messageID != null) {
             additionalGameInfo = additionalRepo.fetch("u%s_c%s_m%s".formatted(userID, chatID, messageID));
-            if (additionalGameInfo != null) return additionalGameInfo.game;
+            if (additionalGameInfo != null) game = repo.fetch(additionalGameInfo.gameID);
+            if (game != null) return game;
         }
         if (userID != null && chatID != null) {
             additionalGameInfo = additionalRepo.fetch("u%s_c%s".formatted(userID, chatID));
-            if (additionalGameInfo != null) return additionalGameInfo.game;
-        }
-        if (gameID != null) {
-            Game.SerializedGame game = repo.fetch(gameID);
+            if (additionalGameInfo != null)  game = repo.fetch(additionalGameInfo.gameID);
             if (game != null) return game;
         }
         throw new GameException("Games not found");
+    }
+
+    @NotNull
+    public Game.SerializedGame change(String userID, String chatID, String messageID, String gameID) throws GameException {
+        Game.SerializedGame game = queryNotNull(userID,chatID,messageID,gameID);
+        Game.SerializedGame update = new Game.SerializedGame(
+                game.gameID(),
+                game.width(),
+                game.height(),
+                game.sum(),
+                game.units(),
+                game.steps(),
+                game.mines(),
+                game.flags(),
+                !game.currentStepFlag(),
+                game.status(),
+                game.typed(),
+                game.start(),
+                game.duration()
+        );
+        repo.save(update);
+        return update;
     }
 
     @NotNull

@@ -46,6 +46,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                         case flag -> flag(args, userID, username, chatID, messageID, gameID);
                         case quit -> quit(args, userID, username, chatID, messageID,gameID);
                         case help -> help(args, userID, username, chatID);
+                        case change -> change(args, userID, username, chatID, messageID, gameID);
                     }
                 } catch (GameException e) {
                     client.execute(
@@ -130,6 +131,11 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
             }
             default -> throw new GameException("Command args too long.");
         }
+    }
+
+    private void change(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+        Game.SerializedGame game = gameManager.change(userID,chatID,messageID,gameID);
+        display.display(game, userID, username, chatID, messageID);
     }
 
     private void dig(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
