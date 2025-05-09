@@ -35,7 +35,7 @@ public class Main {
 
 
         SingleGameCommandHandlers singleGameCommandHandlers = new SingleGameCommandHandlers(innerBotCommandHandlers);
-        SinglePlayerSweeperGameCallbackHandler singlePlayerSweeperGameCallbackHandler = new SinglePlayerSweeperGameCallbackHandler(innerBotCommandHandlers);
+        SinglePlayerSweeperGameCallbackHandler singlePlayerSweeperGameCallbackHandler = new SinglePlayerSweeperGameCallbackHandler(innerBotCommandHandlers,client);
 
         log.info("Starting TelegramBot Game..");
 

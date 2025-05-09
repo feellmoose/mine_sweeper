@@ -196,7 +196,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
         log.debug("Quit option... {}", Arrays.asList(args));
         gameManager.quit(userID, chatID, messageID, gameID);
         String str = "@" + username + " quit game success!";
-        client.execute(SendMessage.builder()
+        client.executeAsync(SendMessage.builder()
                 .chatId(chatID)
                 .text(str)
                 .build());
@@ -204,7 +204,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
 
     private void help(String[] args, String userID, String username, String chatID) throws GameException, TelegramApiException {
         log.debug("Help option... {}", Arrays.asList(args));
-        client.execute(SendMessage.builder()
+        client.executeAsync(SendMessage.builder()
                 .chatId(chatID)
                 .text("""
                         @%s

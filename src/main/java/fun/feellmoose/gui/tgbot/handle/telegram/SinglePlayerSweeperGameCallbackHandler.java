@@ -3,20 +3,26 @@ package fun.feellmoose.gui.tgbot.handle.telegram;
 import fun.feellmoose.gui.tgbot.command.SinglePlayerSweeperGameCommand;
 import fun.feellmoose.gui.tgbot.handle.common.InnerBotCommandHandlers;
 import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 public class SinglePlayerSweeperGameCallbackHandler implements CallbackQueryHandler {
 
     private final InnerBotCommandHandlers handlers;
+    private final TelegramClient client;
 
-    public SinglePlayerSweeperGameCallbackHandler(InnerBotCommandHandlers handlers) {
+    public SinglePlayerSweeperGameCallbackHandler(InnerBotCommandHandlers handlers, TelegramClient client) {
         this.handlers = handlers;
+        this.client = client;
     }
 
     @Override
@@ -73,6 +79,21 @@ public class SinglePlayerSweeperGameCallbackHandler implements CallbackQueryHand
                 message.getMessageId().toString(),
                 gameID
         ));
+
+        if (type == SinglePlayerSweeperGameCommand.Type.quit) {
+            try {
+                client.executeAsync(
+                        EditMessageReplyMarkup.builder()
+                                .chatId(message.getChatId())
+                                .messageId(message.getMessageId())
+                                .replyMarkup(InlineKeyboardMarkup.builder()
+                                        .keyboard(List.of()).build()
+                                ).build()
+                );
+            }catch (Exception e){
+                log.error("Error while quit clean button", e);
+            }
+        }
 
     }
 }

@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
@@ -37,7 +38,7 @@ public class SinglePlayerSweeperGameDisplay {
     private void buttonView(Game.SerializedGame game, String userID, String username, String chatID, String messageID) throws TelegramApiException {
 
         if (game == null) {
-            client.execute(
+            client.executeAsync(
                     EditMessageReplyMarkup.builder()
                             .chatId(chatID)
                             .messageId(Integer.parseInt(messageID))
@@ -51,10 +52,32 @@ public class SinglePlayerSweeperGameDisplay {
         }
 
         if (game.isWin()) {
-            client.execute(SendMessage.builder()
-                    .chatId(chatID)
-                    .text("\uD83C\uDF89")
-                    .build());
+            client.executeAsync(
+                    EditMessageReplyMarkup.builder()
+                            .chatId(chatID)
+                            .messageId(Integer.parseInt(messageID))
+                            .replyMarkup(
+                                    InlineKeyboardMarkup.builder()
+                                            .keyboard(List.of())
+                                            .build()
+                            ).build()
+            );
+            client.executeAsync(
+                    EditMessageText.builder()
+                            .chatId(chatID)
+                            .messageId(Integer.parseInt(messageID))
+                            .text("""
+                                    @%s
+                                    Congratulations! 🎉
+                                    You've successfully completed the game in %s seconds.
+                                    Map Dimensions: %d × %d
+                                    Number of Mines: %d
+                                    Well done on your achievement!
+                                    """.formatted(
+                                            username, game.duration(),
+                                    game.width(), game.height(), game.mines().length)
+                            ).build()
+            );
         }
 
         String command = game.currentStepFlag()? "flag" : "dig";
@@ -84,7 +107,7 @@ public class SinglePlayerSweeperGameDisplay {
                                     .text("\uD83D\uDEA9")
                                     .build());
                             case -1 -> row.add(InlineKeyboardButton.builder()
-                                    .text("⬛")
+                                    .text(" ")
                                     .build());
                             default -> row.add(InlineKeyboardButton.builder()
                                     .text(String.valueOf(num))
@@ -95,8 +118,8 @@ public class SinglePlayerSweeperGameDisplay {
                 keyboard.add(row);
             }
         } else {
-            InlineKeyboardRow row = new InlineKeyboardRow();
             for (int i = 0; i < game.units().length; i++) {
+                InlineKeyboardRow row = new InlineKeyboardRow();
                 for (int j = 0; j < game.units()[i].length; j++) {
                     int num = game.units()[i][j].getFilteredNum();
                     //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
@@ -107,7 +130,7 @@ public class SinglePlayerSweeperGameDisplay {
                                 .callbackData(data)
                                 .build());
                         case -1 -> row.add(InlineKeyboardButton.builder()
-                                .text("⬛")
+                                .text(" ")
                                 .callbackData(data)
                                 .build());
                         default -> row.add(InlineKeyboardButton.builder()
@@ -209,7 +232,7 @@ public class SinglePlayerSweeperGameDisplay {
                 }
             }
 
-            client.execute(SendMessage.builder()
+            client.executeAsync(SendMessage.builder()
                     .chatId(chatID)
                     .text(str.toString())
                     .build());
