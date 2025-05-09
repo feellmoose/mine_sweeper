@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,16 +23,35 @@ public class SinglePlayerSweeperGameCallbackHandler implements CallbackQueryHand
 
     @Override
     public void handle(CallbackQuery query) {
-
-        //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
-        String[] data = query.getData().split(":");
-        if (data.length != 3) return;
-        if (!data[0].equals("single-player-sweeper-game")) return;
-
+        String queryData = query.getData();
         User user = query.getFrom();
         MaybeInaccessibleMessage message = query.getMessage();
         Chat chat = message.getChat();
         String chatID = chat.getId().toString();
+
+        if (queryData == null) return;
+        if (queryData.startsWith("/create")) {
+            String[] args = queryData.split(" ");
+            String[] arguments;
+            if (args.length == 1) arguments = new String[0];
+            else arguments = Arrays.copyOfRange(args, 1, args.length);
+            handlers.handle(new SinglePlayerSweeperGameCommand(
+                    SinglePlayerSweeperGameCommand.Type.create,
+                    arguments,
+                    user.getId().toString(),
+                    user.getUserName(),
+                    chat.getId().toString(),
+                    chat.getTitle(),
+                    message.getMessageId().toString(),
+                    null
+            ));
+        }
+
+        //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
+        String[] data = queryData.split(":");
+        if (data.length != 3) return;
+        if (!data[0].equals("single-player-sweeper-game")) return;
+
         String gameID = data[1];
 
         Pattern pattern = Pattern.compile("(\\w+)\\((\\d+),\\s*(\\d+)\\)");

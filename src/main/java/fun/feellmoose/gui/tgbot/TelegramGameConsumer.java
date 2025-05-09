@@ -31,7 +31,6 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
     @Override
     public void consume(List<Update> list) {
         for (Update update : list) {
-            log.debug("Received update [{}]", update);
             if (update.hasCallbackQuery()) {
                 CallbackQuery callbackQuery = update.getCallbackQuery();
                 for (CallbackQueryHandler handler : callbacks) {

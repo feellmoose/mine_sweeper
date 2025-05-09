@@ -10,8 +10,15 @@ import fun.feellmoose.muti.SinglePlayerGameManager;
 import kotlin.random.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+
+import java.util.List;
 
 @Slf4j
 public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHandler {
@@ -38,6 +45,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 String messageID,
                 String gameID
         )) {
+            log.debug("Received command: {}", command);
             try {
                 try {
                     switch (type) {
@@ -82,7 +90,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
         switch (args.length) {
             case 0 -> {
                 //send create guide for user
-                client.execute(
+                Message message = client.execute(
                         SendMessage.builder()
                                 .chatId(chatID)
                                 .text("""
@@ -92,7 +100,23 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                                         """.formatted(username))
                                 .build()
                 );
-
+                var row = new InlineKeyboardRow();
+                row.add(
+                        InlineKeyboardButton.builder()
+                                .text("Start classic mod")
+                                .callbackData("/create 8 8 12")
+                                .build()
+                );
+                client.execute(
+                        EditMessageReplyMarkup.builder()
+                                .chatId(message.getChatId())
+                                .messageId(message.getMessageId())
+                                .replyMarkup(InlineKeyboardMarkup.builder()
+                                        .keyboard(List.of(
+                                                row
+                                        )).build()
+                                ).build()
+                );
             }
             case 1 -> {
                 if (args[0].equals("random")) {
