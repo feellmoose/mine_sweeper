@@ -212,20 +212,30 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                         Here's a list of commands to get you started:
                         
                         /create Create a new single person game with guide.
-                        /create level <level> Create a classic single person game.
-                        /create button [mine] Create 8 × 8 single person game easily controlled by inline-button.
-                        /create <width> <height> <mine> Create width × height single person game, witch could be controlled by button(if size smaller than 8 × 8) or commands.
-                        /dig <x> <y> Dig hole if you think there is no mine here.
-                        /flag <x> <y> Plant a flag if you think there is mine here(which can help you think and better control).
-                        /quit Quit your single person game in this chat.
-                        /stop Stop listening letter number options.
-                        /continue Continue listening letter number options.
-                        /admin quit Force stop and quit game in this chat.
+                        /create <width> <height> <mine> Create width × height single person game, witch could be controlled by button(if size smaller than 8 × 8).
                         /help List commands.
                         
                         Mine Sweeper Bot Plus
                         version v0.0.1
                         """.formatted(username))
                 .build());
+        //@%s
+        //                        Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
+        //                        Here's a list of commands to get you started:
+        //
+        //                        /create Create a new single person game with guide.
+        //                        /create level <level> Create a classic single person game.
+        //                        /create button [mine] Create 8 × 8 single person game easily controlled by inline-button.
+        //                        /create <width> <height> <mine> Create width × height single person game, witch could be controlled by button(if size smaller than 8 × 8) or commands.
+        //                        /dig <x> <y> Dig hole if you think there is no mine here.
+        //                        /flag <x> <y> Plant a flag if you think there is mine here(which can help you think and better control).
+        //                        /quit Quit your single person game in this chat.
+        //                        /stop Stop listening letter number options.
+        //                        /continue Continue listening letter number options.
+        //                        /admin quit Force stop and quit game in this chat.
+        //                        /help List commands.
+        //
+        //                        Mine Sweeper Bot Plus
+        //                        version v0.0.1
     }
 }
