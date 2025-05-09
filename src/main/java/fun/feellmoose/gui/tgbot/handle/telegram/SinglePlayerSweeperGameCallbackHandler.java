@@ -9,8 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Slf4j
 public class SinglePlayerSweeperGameCallbackHandler implements CallbackQueryHandler {
@@ -30,8 +28,8 @@ public class SinglePlayerSweeperGameCallbackHandler implements CallbackQueryHand
         String chatID = chat.getId().toString();
 
         if (queryData == null) return;
-        if (queryData.startsWith("/create")) {
-            String[] args = queryData.split(" ");
+        if (queryData.startsWith("create")) {
+            String[] args = queryData.split(":");
             String[] arguments;
             if (args.length == 1) arguments = new String[0];
             else arguments = Arrays.copyOfRange(args, 1, args.length);
@@ -48,39 +46,33 @@ public class SinglePlayerSweeperGameCallbackHandler implements CallbackQueryHand
         }
 
         //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
+        //schema: spsg:<gameID>:<option>:<x>:<y>
         String[] data = queryData.split(":");
-        if (data.length != 3) return;
-        if (!data[0].equals("single-player-sweeper-game")) return;
-
+        if (data.length != 5) return;
+        if (!data[0].equals("spsg")) return;
         String gameID = data[1];
+        String command = data[2];
 
-        Pattern pattern = Pattern.compile("(\\w+)\\((\\d+),\\s*(\\d+)\\)");
-        Matcher matcher = pattern.matcher(data[2]);
+        SinglePlayerSweeperGameCommand.Type type = switch (command) {
+            case "dig" -> SinglePlayerSweeperGameCommand.Type.dig;
+            case "flag" -> SinglePlayerSweeperGameCommand.Type.flag;
+            case "quit" -> SinglePlayerSweeperGameCommand.Type.quit;
+            case "change" -> SinglePlayerSweeperGameCommand.Type.change;
+            default -> null;
+        };
+        if (type == null) return;
+        String x = data[3];
+        String y = data[4];
+        handlers.handle(new SinglePlayerSweeperGameCommand(
+                type,
+                new String[]{x, y},
+                user.getId().toString(),
+                user.getUserName(),
+                chatID,
+                chat.getTitle(),
+                message.getMessageId().toString(),
+                gameID
+        ));
 
-        if (matcher.matches()) {
-            String command = matcher.group(1);
-            SinglePlayerSweeperGameCommand.Type type = switch (command) {
-                case "dig" -> SinglePlayerSweeperGameCommand.Type.dig;
-                case "flag" -> SinglePlayerSweeperGameCommand.Type.flag;
-                case "quit" -> SinglePlayerSweeperGameCommand.Type.quit;
-                case "change" -> SinglePlayerSweeperGameCommand.Type.change;
-                default -> null;
-            };
-            if (type == null) return;
-            String x = matcher.group(2);
-            String y = matcher.group(3);
-            handlers.handle(new SinglePlayerSweeperGameCommand(
-                    type,
-                    new String[]{x, y},
-                    user.getId().toString(),
-                    user.getUserName(),
-                    chatID,
-                    chat.getTitle(),
-                    message.getMessageId().toString(),
-                    gameID
-            ));
-        } else {
-            log.error("Invalid format. Please enter coordinates in (x, y) format, with non-negative integers.");
-        }
     }
 }

@@ -100,7 +100,7 @@ public class SinglePlayerSweeperGameDisplay {
                 for (int j = 0; j < game.units()[i].length; j++) {
                     int num = game.units()[i][j].getFilteredNum();
                     //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
-                    String data = "single-player-sweeper-game:%s:%s(%d,%d)".formatted(game.gameID(),command,i,j);
+                    String data = "spsg:%s:%s:%d:%d".formatted(game.gameID(),command,i,j);
                     switch (num) {
                         case -2 -> row.add(InlineKeyboardButton.builder()
                                 .text("\uD83D\uDEA9")
@@ -123,8 +123,8 @@ public class SinglePlayerSweeperGameDisplay {
 
         InlineKeyboardRow row = new InlineKeyboardRow();
         //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
-        String change = "single-player-sweeper-game:%s:change(0,0)".formatted(game.gameID());
-        String quit = "single-player-sweeper-game:%s:quit(0,0)".formatted(game.gameID());
+        String change = "spsg:%s:change:0:0".formatted(game.gameID());
+        String quit = "spsg:%s:quit:0:0".formatted(game.gameID());
         row.add(
                 InlineKeyboardButton.builder()
                         .text(game.currentStepFlag()?"Dig":"Flag")
