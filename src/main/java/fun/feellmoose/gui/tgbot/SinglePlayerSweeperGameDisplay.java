@@ -162,8 +162,7 @@ public class SinglePlayerSweeperGameDisplay {
         );
         keyboard.add(row);
 
-
-        client.execute(
+        client.executeAsync(
                 EditMessageReplyMarkup.builder()
                         .chatId(chatID)
                         .messageId(Integer.parseInt(messageID))
@@ -179,7 +178,7 @@ public class SinglePlayerSweeperGameDisplay {
     private void classicView(Game.SerializedGame game, String userID, String username, String chatID) throws TelegramApiException {
         try {
             if (game.isWin()) {
-                client.execute(SendMessage.builder()
+                client.executeAsync(SendMessage.builder()
                         .chatId(chatID)
                         .text("\uD83C\uDF89")
                         .build());
