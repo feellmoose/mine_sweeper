@@ -1,7 +1,9 @@
 package fun.feellmoose.core;
 
+import fun.feellmoose.muti.Repo;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -21,6 +23,8 @@ public class Game implements IGame {
     private final List<Step> mines;
     private final Set<Step> flags;
 
+    @Getter
+    private boolean currentStepFlag = false;
     private Status status = Status.Init;
     private int typed = 0;
     private LocalDateTime start;
@@ -157,6 +161,7 @@ public class Game implements IGame {
                 if (u.isMine()) {
                     //Typed mine ... boom! Game is Over.
                     this.status = Status.End;
+                    this.currentStepFlag = false;
                     this.duration = Duration.between(start, LocalDateTime.now());
                     return true;
                 }
@@ -169,6 +174,7 @@ public class Game implements IGame {
             }
         }
         if (typed + mines.size() == sum) this.status = Status.End;
+        this.currentStepFlag = false;
         return true;
     }
 
@@ -226,6 +232,7 @@ public class Game implements IGame {
                 return false;
             }
         }
+        this.currentStepFlag = true;
         return true;
     }
 
@@ -259,11 +266,12 @@ public class Game implements IGame {
             Step[] steps,
             Step[] mines,
             Step[] flags,
+            boolean currentStepFlag,
             IGame.Status status,
             int typed,
             @Nullable LocalDateTime start,
             @Nullable Duration duration
-    ) {
+    ) implements Repo.Identified<Game.SerializedGame> {
 
         public boolean isWin() {
             return status == Status.End && typed + mines.length == sum;
@@ -279,6 +287,7 @@ public class Game implements IGame {
                     Arrays.stream(steps).collect(Collectors.toList()),
                     Arrays.stream(mines).collect(Collectors.toList()),
                     Arrays.stream(flags).collect(Collectors.toSet()),
+                    currentStepFlag,
                     status,
                     typed,
                     start,
@@ -296,11 +305,17 @@ public class Game implements IGame {
                     game.steps.toArray(new Step[0]),
                     game.mines.toArray(new Step[0]),
                     game.flags.toArray(new Step[0]),
+                    game.currentStepFlag,
                     game.status,
                     game.typed,
                     game.start,
                     game.duration
             );
+        }
+
+        @Override
+        public String getId() {
+            return gameID;
         }
     }
 

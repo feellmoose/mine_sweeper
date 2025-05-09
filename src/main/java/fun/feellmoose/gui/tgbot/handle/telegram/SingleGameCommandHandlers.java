@@ -36,6 +36,10 @@ public class SingleGameCommandHandlers {
         return new Quit(handlers);
     }
 
+    public Help help() {
+        return new Help(handlers);
+    }
+
     @AllArgsConstructor
     public static class Create implements CommandHandler {
 
@@ -57,7 +61,9 @@ public class SingleGameCommandHandlers {
                     from.getId().toString(),
                     from.getUserName(),
                     chat.getId().toString(),
-                    chat.getTitle()
+                    chat.getTitle(),
+                    message.getMessageId().toString(),
+                    null
             ));
         }
     }
@@ -83,7 +89,9 @@ public class SingleGameCommandHandlers {
                     from.getId().toString(),
                     from.getUserName(),
                     chat.getId().toString(),
-                    chat.getTitle()
+                    chat.getTitle(),
+                    message.getMessageId().toString(),
+                    null
             ));
         }
 
@@ -110,7 +118,9 @@ public class SingleGameCommandHandlers {
                     from.getId().toString(),
                     from.getUserName(),
                     chat.getId().toString(),
-                    chat.getTitle()
+                    chat.getTitle(),
+                    message.getMessageId().toString(),
+                    null
             ));
         }
 
@@ -137,9 +147,40 @@ public class SingleGameCommandHandlers {
                     from.getId().toString(),
                     from.getUserName(),
                     chat.getId().toString(),
-                    chat.getTitle()
+                    chat.getTitle(),
+                    message.getMessageId().toString(),
+                    null
             ));
         }
+    }
+
+    @AllArgsConstructor
+    public static class Help implements CommandHandler {
+
+        private final InnerBotCommandHandlers handlers;
+
+        @Override
+        public String getName() {
+            return "/help";
+        }
+
+        @Override
+        public void handle(Message message, Chat chat, User from, String[] args) {
+            String[] arguments;
+            if (args.length == 1) arguments = new String[0];
+            else arguments = Arrays.copyOfRange(args, 1, args.length);
+            handlers.handle(new SinglePlayerSweeperGameCommand(
+                    SinglePlayerSweeperGameCommand.Type.help,
+                    arguments,
+                    from.getId().toString(),
+                    from.getUserName(),
+                    chat.getId().toString(),
+                    chat.getTitle(),
+                    message.getMessageId().toString(),
+                    null
+            ));
+        }
+
     }
 
 }

@@ -1,13 +1,14 @@
 package fun.feellmoose;
 
+import fun.feellmoose.core.Game;
 import fun.feellmoose.core.GameException;
 import fun.feellmoose.gui.tgbot.TelegramBotGame;
 import fun.feellmoose.gui.tgbot.handle.common.InnerBotCommandHandlers;
 import fun.feellmoose.gui.tgbot.handle.common.SinglePlayerSweeperGameCommandHandler;
 import fun.feellmoose.gui.tgbot.handle.telegram.SingleGameCommandHandlers;
 import fun.feellmoose.gui.tgbot.handle.telegram.SinglePlayerSweeperGameCallbackHandler;
-import fun.feellmoose.muti.GameRepo;
-import fun.feellmoose.muti.MemoryGameRepo;
+import fun.feellmoose.muti.MemoryRepo;
+import fun.feellmoose.muti.Repo;
 import fun.feellmoose.muti.SinglePlayerGameManager;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -22,8 +23,10 @@ public class Main {
 
         log.debug("Loaded telegram bot token: [{}]", botToken);
 
-        GameRepo repo = new MemoryGameRepo();
-        SinglePlayerGameManager gameManager = new SinglePlayerGameManager(repo);
+        Repo<Game.SerializedGame> repo = new MemoryRepo<>();
+        Repo<SinglePlayerGameManager.AdditionalGameInfo> additional = new MemoryRepo<>();
+
+        SinglePlayerGameManager gameManager = new SinglePlayerGameManager(repo,additional);
         OkHttpTelegramClient client = new OkHttpTelegramClient(botToken);
 
 
@@ -43,11 +46,12 @@ public class Main {
                 .registerCommandHandler(singleGameCommandHandlers.flag())
                 .registerCommandHandler(singleGameCommandHandlers.dig())
                 .registerCommandHandler(singleGameCommandHandlers.quit())
+                .registerCommandHandler(singleGameCommandHandlers.help())
                 .build();
         try {
             game.start();
-        }catch (TelegramApiException e){
-            log.error("TelegramBot Game started failed",e);
+        } catch (TelegramApiException e) {
+            log.error("TelegramBot Game started failed", e);
             System.exit(1);
         }
         log.info("TelegramBot Game started successfully!");

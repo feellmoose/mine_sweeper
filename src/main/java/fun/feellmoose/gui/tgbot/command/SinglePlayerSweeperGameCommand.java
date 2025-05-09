@@ -7,7 +7,9 @@ public record SinglePlayerSweeperGameCommand(
         String userID,
         String username,
         String chatID,
-        String chatName
+        String chatName,
+        String messageID,
+        String gameID
 ) implements InnerBotCommand {
 
     @Override public String title() {
@@ -23,7 +25,9 @@ public record SinglePlayerSweeperGameCommand(
         create("/create"),
         dig("/dig"),
         flag("/flag"),
-        quit("/quit");
+        quit("/quit"),
+        change("/change"),
+        help("/help");
         private final String command;
 
         Type(String command) {

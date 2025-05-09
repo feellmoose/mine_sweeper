@@ -1,29 +1,31 @@
 package fun.feellmoose.muti;
 
+import com.sun.source.tree.IdentifierTree;
 import fun.feellmoose.core.Game;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.concurrent.*;
 
-public class MemoryGameRepo implements GameRepo {
-
-    private final ConcurrentHashMap<String, DelayedGame> games = new ConcurrentHashMap<>();
-    private final DelayQueue<DelayedGame> queue = new DelayQueue<>();
+public class MemoryRepo<T extends Repo.Identified<T>> implements Repo<T> {
+    private final ConcurrentHashMap<String, DelayedObj<T>> saver = new ConcurrentHashMap<>();
+    private final DelayQueue<DelayedObj<T>> queue = new DelayQueue<>();
     private static final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     private final long ttl;
 
-    public MemoryGameRepo(long ttl) {
+
+
+    public MemoryRepo(long ttl) {
         this.ttl = ttl;
         executor.submit(() -> {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    DelayedGame delayed = queue.take();
-                    String gameID = delayed.game.gameID();
-                    DelayedGame game = games.get(gameID);
+                    DelayedObj<T> delayed = queue.take();
+                    String gameID = delayed.obj.getId();
+                    DelayedObj<T> game = saver.get(gameID);
                     if (game != null && game.equals(delayed)) {
-                        games.remove(gameID);
+                        saver.remove(gameID);
                     }
                 }
             } catch (InterruptedException e) {
@@ -32,11 +34,11 @@ public class MemoryGameRepo implements GameRepo {
         });
     }
 
-    public MemoryGameRepo() {
+    public MemoryRepo() {
         this(Duration.ofDays(1).toMillis());
     }
 
-    private record DelayedGame(Game.SerializedGame game, Duration delay) implements Delayed {
+    private record DelayedObj<T>(T obj, Duration delay) implements Delayed {
         private static final TimeUnit TIME_UNIT = TimeUnit.NANOSECONDS;
 
         @Override
@@ -64,21 +66,21 @@ public class MemoryGameRepo implements GameRepo {
     }
 
     @Override
-    public void save(Game.SerializedGame game) {
-        games.compute(game.gameID(), (key, value) -> {
-            var next = new DelayedGame(game, Duration.ofMillis(ttl));
+    public void save(T obj) {
+        saver.compute(obj.getId(), (key, value) -> {
+            var next = new MemoryRepo.DelayedObj<>(obj, Duration.ofMillis(ttl));
             queue.add(next);
             return next;
         });
     }
 
     @Override
-    public Game.SerializedGame fetch(String gameID) {
-        return games.get(gameID).game;
+    public T fetch(String gameID) {
+        return saver.get(gameID).obj;
     }
 
     @Override
     public void remove(String gameID) {
-        games.remove(gameID);
+        saver.remove(gameID);
     }
 }

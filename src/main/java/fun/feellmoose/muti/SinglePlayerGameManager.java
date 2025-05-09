@@ -6,25 +6,51 @@ import fun.feellmoose.core.Step;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class SinglePlayerGameManager {
     private final ReentrantLock lock = new ReentrantLock();
-    private final GameRepo repo;
-    private final ConcurrentHashMap<String, String> startedGames = new ConcurrentHashMap<>();
+    private final Repo<Game.SerializedGame> repo;
+    private final Repo<AdditionalGameInfo> additionalRepo;
 
-    public SinglePlayerGameManager(GameRepo repo) {
+    public record AdditionalGameInfo(
+            Game.SerializedGame game,
+            GameType type,
+            String userID,
+            String chatID,
+            String messageID) implements Repo.Identified<AdditionalGameInfo> {
+        @Override
+        public String getId() {
+            return switch (type){
+                case button -> "u%s_c%s_m%s".formatted(userID, chatID, messageID);
+                case picture -> "u%s_c%s".formatted(userID, chatID);
+            };
+        }
+    }
+
+    enum GameType{
+        button, picture
+    }
+
+    public SinglePlayerGameManager(Repo<Game.SerializedGame> repo, Repo<AdditionalGameInfo> additionalRepo) {
         this.repo = repo;
+        this.additionalRepo = additionalRepo;
     }
 
     @NotNull
-    public Game.SerializedGame create(String userID, int width, int height, int num) throws GameException {
+    public Game.SerializedGame create(String userID, String chatID, String messageID, int width, int height, int num) throws GameException {
         lock.lock();
         try {
             var game = Game.init(width, height, num).serialized();
+            AdditionalGameInfo gameInfo = new AdditionalGameInfo(
+                    game,
+                    game.width() > 8 || game.height() > 8 ? GameType.picture : GameType.button,
+                    userID,
+                    chatID,
+                    messageID
+            );
             repo.save(game);
-            startedGames.put(userID, game.gameID());
+            additionalRepo.save(gameInfo);
             return game;
         } finally {
             lock.unlock();
@@ -32,45 +58,61 @@ public class SinglePlayerGameManager {
     }
 
     @Nullable
-    public Game.SerializedGame query(String userID) {
-        String gameID = startedGames.get(userID);
-        if (gameID == null) return null;
-        return repo.fetch(gameID);
+    public Game.SerializedGame query(String userID, String chatID, String messageID, String gameID) {
+        AdditionalGameInfo additionalGameInfo = additionalRepo.fetch("u%s_c%s_m%s".formatted(userID, chatID, messageID));
+        if (additionalGameInfo != null) return additionalGameInfo.game;
+        additionalGameInfo = additionalRepo.fetch("u%s_c%s".formatted(userID, chatID));
+        if (additionalGameInfo != null) return additionalGameInfo.game;
+        if (gameID != null) return repo.fetch(gameID);
+        return null;
     }
 
     @NotNull
-    private Game.SerializedGame queryNotNull(String userID) throws GameException {
-        String gameID = startedGames.get(userID);
-        if (gameID == null) throw new GameException("Games not found");
-        var game = repo.fetch(gameID);
-        if (game == null) throw new GameException("Games not found");
-        return game;
+    private Game.SerializedGame queryNotNull(String userID, String chatID, String messageID, String gameID) throws GameException {
+        AdditionalGameInfo additionalGameInfo = null;
+        if (userID != null && chatID != null && messageID != null) {
+            additionalGameInfo = additionalRepo.fetch("u%s_c%s_m%s".formatted(userID, chatID, messageID));
+            if (additionalGameInfo != null) return additionalGameInfo.game;
+        }
+        if (userID != null && chatID != null) {
+            additionalGameInfo = additionalRepo.fetch("u%s_c%s".formatted(userID, chatID));
+            if (additionalGameInfo != null) return additionalGameInfo.game;
+        }
+        if (gameID != null) {
+            Game.SerializedGame game = repo.fetch(gameID);
+            if (game != null) return game;
+        }
+        throw new GameException("Games not found");
     }
 
     @NotNull
-    public Game.SerializedGame dig(String userID, Step step) throws GameException {
-        Game game = queryNotNull(userID).deserialize();
-        if (!game.onTyped(step.x(), step.y())) throw new GameException("("+step.x()+","+step.y()+")" + " is not a valid step");
+    public Game.SerializedGame dig(String userID, String chatID, String messageID, String gameID, Step step) throws GameException {
+        Game game = queryNotNull(userID,chatID,messageID,gameID).deserialize();
+        if (!game.onTyped(step.x(), step.y()))
+            throw new GameException("(" + step.x() + "," + step.y() + ")" + " is not a valid step");
         var update = game.serialized();
         repo.save(update);
         return update;
     }
 
     @NotNull
-    public Game.SerializedGame flag(String userID, Step step) throws GameException {
-        Game game = queryNotNull(userID).deserialize();
+    public Game.SerializedGame flag(String userID, String chatID, String messageID, String gameID, Step step) throws GameException {
+        Game game = queryNotNull(userID,chatID,messageID,gameID).deserialize();
         if (!game.onFlag(step.x(), step.y()))
-            throw new GameException("("+step.x()+","+step.y()+")" + " is not valid for planting or cancelling a flag");
+            throw new GameException("(" + step.x() + "," + step.y() + ")" + " is not valid for planting or cancelling a flag");
         var update = game.serialized();
         repo.save(update);
         return update;
     }
 
-    public void quit(String userID) throws GameException {
-        String gameID = startedGames.get(userID);
-        if (gameID == null) throw new GameException("Games not found");
-        repo.remove(gameID);
-        startedGames.remove(userID);
+    public void quit(String userID, String chatID, String messageID, String gameID) throws GameException {
+        if (userID != null && chatID != null && messageID != null) {
+            additionalRepo.remove("u%s_c%s_m%s".formatted(userID, chatID, messageID));
+        } else if (userID != null && chatID != null) {
+            additionalRepo.remove("u%s_c%s".formatted(userID, chatID));
+        } else if (gameID != null) {
+            repo.remove(gameID);
+        }
     }
 
 }

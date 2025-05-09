@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
+import org.telegram.telegrambots.meta.api.objects.message.MaybeInaccessibleMessage;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,22 +22,28 @@ public class SinglePlayerSweeperGameCallbackHandler implements CallbackQueryHand
 
     @Override
     public void handle(CallbackQuery query) {
-        String game = query.getGameShortName();
-        if (!game.equals("single-player-sweeper-game")) return;
 
-        String data = query.getData();
+        //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
+        String[] data = query.getData().split(":");
+        if (data.length != 3) return;
+        if (!data[0].equals("single-player-sweeper-game")) return;
+
         User user = query.getFrom();
-        Chat chat = query.getMessage().getChat();
+        MaybeInaccessibleMessage message = query.getMessage();
+        Chat chat = message.getChat();
         String chatID = chat.getId().toString();
+        String gameID = data[1];
 
         Pattern pattern = Pattern.compile("(\\w+)\\((\\d+),\\s*(\\d+)\\)");
-        Matcher matcher = pattern.matcher(data);
+        Matcher matcher = pattern.matcher(data[2]);
 
         if (matcher.matches()) {
             String command = matcher.group(1);
             SinglePlayerSweeperGameCommand.Type type = switch (command) {
                 case "dig" -> SinglePlayerSweeperGameCommand.Type.dig;
                 case "flag" -> SinglePlayerSweeperGameCommand.Type.flag;
+                case "quit" -> SinglePlayerSweeperGameCommand.Type.quit;
+                case "change" -> SinglePlayerSweeperGameCommand.Type.change;
                 default -> null;
             };
             if (type == null) return;
@@ -48,7 +55,9 @@ public class SinglePlayerSweeperGameCallbackHandler implements CallbackQueryHand
                     user.getId().toString(),
                     user.getUserName(),
                     chatID,
-                    chat.getTitle()
+                    chat.getTitle(),
+                    message.getMessageId().toString(),
+                    gameID
             ));
         } else {
             log.error("Invalid format. Please enter coordinates in (x, y) format, with non-negative integers.");
