@@ -122,6 +122,7 @@ public class SinglePlayerSweeperGameDisplay {
                     if (contains) {
                         row.add(InlineKeyboardButton.builder()
                                 .text("\uD83D\uDCA3")
+                                .callbackData("empty")
                                 .build());
                     } else {
                         int num = units[i][j].getFilteredNum();
@@ -131,7 +132,7 @@ public class SinglePlayerSweeperGameDisplay {
                                     .callbackData("empty")
                                     .build());
                             case -1 -> row.add(InlineKeyboardButton.builder()
-                                    .text("⬛")
+                                    .text("ㅤ")
                                     .callbackData("empty")
                                     .build());
                             default -> row.add(InlineKeyboardButton.builder()
@@ -164,7 +165,7 @@ public class SinglePlayerSweeperGameDisplay {
                                 .callbackData(data)
                                 .build());
                         case -1 -> row.add(InlineKeyboardButton.builder()
-                                .text("⬛")
+                                .text("ㅤ")
                                 .callbackData(data)
                                 .build());
                         default -> row.add(InlineKeyboardButton.builder()
@@ -204,9 +205,6 @@ public class SinglePlayerSweeperGameDisplay {
                                         .build()
                         ).build()
         );
-        if(game.status() == IGame.Status.End) {
-            log.debug("Game ended. Send reply markup success");
-        }
 
     }
 
