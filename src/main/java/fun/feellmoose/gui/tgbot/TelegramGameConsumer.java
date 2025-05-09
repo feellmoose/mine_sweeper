@@ -52,7 +52,7 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
                                     .toArray(String[]::new);
                             for (CommandHandler command : commands) {
                                 if (command.getName().equals(args[0])
-                                        || (command.getName() + "@MineSweeperPlusBot").equals(args[0])
+                                        || (command.getName() + "@mine_sweeper_plus_bot").equals(args[0])
                                 ) command.handle(message, chat, from, args);
                             }
                         } else if ((message.isTopicMessage()
