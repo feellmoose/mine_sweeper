@@ -118,8 +118,7 @@ public class SinglePlayerGameManager {
     @NotNull
     public Game.SerializedGame dig(String userID, String chatID, String messageID, String gameID, Step step) throws GameException {
         Game game = queryNotNull(userID,chatID,messageID,gameID).deserialize();
-        if (!game.onTyped(step.x(), step.y()))
-            throw new GameException("(" + step.x() + "," + step.y() + ")" + " is not a valid step");
+        game.onTyped(step.x(), step.y());
         var update = game.serialized();
         repo.save(update);
         return update;
@@ -128,8 +127,7 @@ public class SinglePlayerGameManager {
     @NotNull
     public Game.SerializedGame flag(String userID, String chatID, String messageID, String gameID, Step step) throws GameException {
         Game game = queryNotNull(userID,chatID,messageID,gameID).deserialize();
-        if (!game.onFlag(step.x(), step.y()))
-            throw new GameException("(" + step.x() + "," + step.y() + ")" + " is not valid for planting or cancelling a flag");
+        game.onFlag(step.x(), step.y());
         var update = game.serialized();
         repo.save(update);
         return update;

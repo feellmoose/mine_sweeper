@@ -53,7 +53,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                         case create -> create(args, userID, username, chatID, messageID);
                         case dig -> dig(args, userID, username, chatID, messageID, gameID);
                         case flag -> flag(args, userID, username, chatID, messageID, gameID);
-                        case quit -> quit(args, userID, username, chatID, messageID,gameID);
+                        case quit -> quit(args, userID, username, chatID, messageID, gameID);
                         case help -> help(args, userID, username, chatID);
                         case change -> change(args, userID, username, chatID, messageID, gameID);
                     }
@@ -77,7 +77,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
 
     private void create(String[] args, String userID, String username, String chatID, String messageID) throws GameException, TelegramApiException {
         log.debug("Creating game... {}", Arrays.asList(args));
-        if (gameManager.query(userID,chatID,messageID,null) != null) {
+        if (gameManager.query(userID, chatID, messageID, null) != null) {
             client.execute(
                     SendMessage.builder()
                             .chatId(chatID)
@@ -126,7 +126,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                     double random = Random.Default.nextDouble(0, 1);
                     //filter to limit num smaller
                     int num = (int) (Math.pow(random, 10) * Math.pow(length, 2));
-                    Game.SerializedGame game = gameManager.create(userID,chatID,messageID, length, length, num);
+                    Game.SerializedGame game = gameManager.create(userID, chatID, messageID, length, length, num);
                     display.display(game, userID, username, chatID, messageID);
                 }
             }
@@ -134,9 +134,9 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 if (args[0].equals("level")) {
                     Game.SerializedGame game;
                     switch (args[1]) {
-                        case "easy" -> game = gameManager.create(userID,chatID,messageID, 9, 9, 10);
-                        case "normal" -> game = gameManager.create(userID,chatID,messageID, 16, 16, 40);
-                        case "hard" -> game = gameManager.create(userID,chatID,messageID, 25, 25, 99);
+                        case "easy" -> game = gameManager.create(userID, chatID, messageID, 9, 9, 10);
+                        case "normal" -> game = gameManager.create(userID, chatID, messageID, 16, 16, 40);
+                        case "hard" -> game = gameManager.create(userID, chatID, messageID, 25, 25, 99);
                         default -> throw new GameException("Game level should be 'easy', 'normal', or 'hard'");
                     }
                     display.display(game, userID, username, chatID, messageID);
@@ -149,7 +149,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                     int mine = Integer.parseInt(args[2]);
                     if (x < 0 || y < 0 || mine < 0 || x > 52 || y > 52 || mine > 52)
                         throw new GameException("x, y and mine num should be between 0 and 52.");
-                    Game.SerializedGame game = gameManager.create(userID,chatID,messageID, x, y, mine);
+                    Game.SerializedGame game = gameManager.create(userID, chatID, messageID, x, y, mine);
                     display.display(game, userID, username, chatID, messageID);
                 } catch (NumberFormatException e) {
                     throw new GameException("x, y and mine num should be a number.");
@@ -159,40 +159,40 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
         }
     }
 
-    private void change(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+    private void change(String[] args, String userID, String username, String chatID, String messageID, String gameID) throws GameException, TelegramApiException {
         log.debug("Change game options mod... {}", Arrays.asList(args));
-        Game.SerializedGame game = gameManager.change(userID,chatID,messageID,gameID);
+        Game.SerializedGame game = gameManager.change(userID, chatID, messageID, gameID);
         display.display(game, userID, username, chatID, messageID);
     }
 
-    private void dig(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+    private void dig(String[] args, String userID, String username, String chatID, String messageID, String gameID) throws GameException, TelegramApiException {
         log.debug("Dig option... {}", Arrays.asList(args));
         if (args.length != 2) throw new GameException("Command args length has to be 2.");
         try {
             int x = Integer.parseInt(args[0]);
             int y = Integer.parseInt(args[1]);
-            Game.SerializedGame game = gameManager.dig(userID,chatID,messageID,gameID, new Step(x, y));
+            Game.SerializedGame game = gameManager.dig(userID, chatID, messageID, gameID, new Step(x, y));
             display.display(game, userID, username, chatID, messageID);
-            if (game.isWin()) gameManager.quit(userID,chatID,messageID,gameID);
+            if (game.isWin()) gameManager.quit(userID, chatID, messageID, gameID);
         } catch (NumberFormatException e) {
             throw new GameException("x, y and mine num should be a number.");
         }
     }
 
-    private void flag(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+    private void flag(String[] args, String userID, String username, String chatID, String messageID, String gameID) throws GameException, TelegramApiException {
         log.debug("Flag option... {}", Arrays.asList(args));
         if (args.length != 2) throw new GameException("Command args length has to be 2.");
         try {
             int x = Integer.parseInt(args[0]);
             int y = Integer.parseInt(args[1]);
-            Game.SerializedGame game = gameManager.flag(userID,chatID,messageID,gameID, new Step(x, y));
+            Game.SerializedGame game = gameManager.flag(userID, chatID, messageID, gameID, new Step(x, y));
             display.display(game, userID, username, chatID, messageID);
         } catch (NumberFormatException e) {
             throw new GameException("x, y and mine num should be a number.");
         }
     }
 
-    private void quit(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+    private void quit(String[] args, String userID, String username, String chatID, String messageID, String gameID) throws GameException, TelegramApiException {
         log.debug("Quit option... {}", Arrays.asList(args));
         gameManager.quit(userID, chatID, messageID, gameID);
         String str = "@" + username + " quit game success!";
