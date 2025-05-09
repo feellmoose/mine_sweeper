@@ -36,8 +36,7 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
                 for (CallbackQueryHandler handler : callbacks) {
                     handler.handle(callbackQuery);
                 }
-            }
-            if (update.hasMessage()) {
+            } else if (update.hasMessage()) {
                 Message message = update.getMessage();
                 User from = message.getFrom();
                 Chat chat = message.getChat();
@@ -55,6 +54,7 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
                         || message.isGroupMessage()
                         || message.isUserMessage()) && message.hasText()
                 ) {
+                    log.debug("received chat message: {}", message.getText());
                     //Line words here
                     String text = message.getText();
                     String[] words = Arrays.stream(text.trim().split(" "))

@@ -75,6 +75,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
     }
 
     private void create(String[] args, String userID, String username, String chatID, String messageID) throws GameException, TelegramApiException {
+        log.debug("Creating game...");
         if (gameManager.query(userID,chatID,messageID,null) != null) {
             client.execute(
                     SendMessage.builder()
@@ -158,11 +159,13 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
     }
 
     private void change(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+        log.debug("Change game options mod...");
         Game.SerializedGame game = gameManager.change(userID,chatID,messageID,gameID);
         display.display(game, userID, username, chatID, messageID);
     }
 
     private void dig(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+        log.debug("Dig option...");
         if (args.length != 2) throw new GameException("Command args length has to be 2.");
         try {
             int x = Integer.parseInt(args[0]);
@@ -176,6 +179,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
     }
 
     private void flag(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+        log.debug("Flag option...");
         if (args.length != 2) throw new GameException("Command args length has to be 2.");
         try {
             int x = Integer.parseInt(args[0]);
@@ -188,6 +192,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
     }
 
     private void quit(String[] args, String userID, String username, String chatID, String messageID,String gameID) throws GameException, TelegramApiException {
+        log.debug("Quit option...");
         gameManager.quit(userID, chatID, messageID, gameID);
         String str = "@" + username + " quit game success!";
         client.execute(SendMessage.builder()
@@ -197,6 +202,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
     }
 
     private void help(String[] args, String userID, String username, String chatID) throws GameException, TelegramApiException {
+        log.debug("Help option...");
         client.execute(SendMessage.builder()
                 .chatId(chatID)
                 .text("""
