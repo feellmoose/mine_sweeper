@@ -33,6 +33,7 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
         for (Update update : list) {
             if (update.hasCallbackQuery()) {
                 CallbackQuery callbackQuery = update.getCallbackQuery();
+                log.debug("received callback: {}", callbackQuery.getData());
                 for (CallbackQueryHandler handler : callbacks) {
                     handler.handle(callbackQuery);
                 }
@@ -43,6 +44,7 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
                 if (message.isCommand() && message.hasText()) {
                     //Command here
                     String text = message.getText();
+                    log.debug("received command: {}", text);
                     String[] args = Arrays.stream(text.trim().split(" "))
                             .filter(s -> !s.isBlank())
                             .toArray(String[]::new);

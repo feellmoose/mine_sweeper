@@ -41,6 +41,7 @@ public class Main {
 
         TelegramBotGame game = TelegramBotGame.builder()
                 .botToken(botToken)
+                .client(client)
                 .registerCallbackQueryHandler(singlePlayerSweeperGameCallbackHandler)
                 .registerCommandHandler(singleGameCommandHandlers.create())
                 .registerCommandHandler(singleGameCommandHandlers.flag())
