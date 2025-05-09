@@ -62,7 +62,7 @@ public class SingleGameCommandHandlers {
                     from.getUserName(),
                     chat.getId().toString(),
                     chat.getTitle(),
-                    message.getMessageId().toString(),
+                    null,
                     null
             ));
         }
@@ -90,7 +90,7 @@ public class SingleGameCommandHandlers {
                     from.getUserName(),
                     chat.getId().toString(),
                     chat.getTitle(),
-                    message.getMessageId().toString(),
+                    null,
                     null
             ));
         }
@@ -119,7 +119,7 @@ public class SingleGameCommandHandlers {
                     from.getUserName(),
                     chat.getId().toString(),
                     chat.getTitle(),
-                    message.getMessageId().toString(),
+                    null,
                     null
             ));
         }
@@ -148,7 +148,7 @@ public class SingleGameCommandHandlers {
                     from.getUserName(),
                     chat.getId().toString(),
                     chat.getTitle(),
-                    message.getMessageId().toString(),
+                    null,
                     null
             ));
         }
@@ -176,7 +176,7 @@ public class SingleGameCommandHandlers {
                     from.getUserName(),
                     chat.getId().toString(),
                     chat.getTitle(),
-                    message.getMessageId().toString(),
+                    null,
                     null
             ));
         }

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
@@ -38,6 +39,20 @@ public class SinglePlayerSweeperGameDisplay {
     }
 
     private void buttonView(Game.SerializedGame game, String userID, String username, String chatID, String messageID) throws TelegramApiException {
+
+         if (messageID == null || messageID.isEmpty()) {
+             Message message = client.execute(
+                     SendMessage.builder()
+                             .chatId(chatID)
+                             .text("""
+                                        @%s
+                                        Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
+                                        Ready to play? Just follow the steps below to start a new game.
+                                        """.formatted(username))
+                             .build()
+             );
+             messageID = message.getMessageId().toString();
+         }
 
         if (game == null) {
             client.executeAsync(
