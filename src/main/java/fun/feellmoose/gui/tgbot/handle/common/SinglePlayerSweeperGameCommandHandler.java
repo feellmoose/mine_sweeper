@@ -78,16 +78,18 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
     private void create(String[] args, String userID, String username, String chatID, String messageID) throws GameException, TelegramApiException {
         log.debug("Creating game... {}", Arrays.asList(args));
         if (gameManager.query(userID, chatID, messageID, null) != null) {
-            client.execute(
-                    SendMessage.builder()
-                            .chatId(chatID)
-                            .text("""
-                                    @%s
-                                    🎮 A game is currently active in this chat!
-                                    To end it early, type '/quit' or '/admin quit'.
-                                    """.formatted(username))
-                            .build()
-            );
+            //TODO diff from button and other game
+            return;
+//            client.execute(
+//                    SendMessage.builder()
+//                            .chatId(chatID)
+//                            .text("""
+//                                    @%s
+//                                    🎮 A game is currently active in this chat!
+//                                    To end it early, type '/quit' or '/admin quit'.
+//                                    """.formatted(username))
+//                            .build()
+//            );
         }
         switch (args.length) {
             case 0 -> {
