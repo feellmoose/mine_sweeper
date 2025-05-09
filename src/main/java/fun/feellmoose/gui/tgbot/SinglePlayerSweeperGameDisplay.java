@@ -120,7 +120,7 @@ public class SinglePlayerSweeperGameDisplay {
                             break;
                         }
                     }
-                    if (!boom.equals(step)) {
+                    if (boom.equals(step)) {
                         row.add(InlineKeyboardButton.builder()
                                 .text("\uD83D\uDCA5")
                                 .callbackData("empty:%s:%s".formatted(i,j))
