@@ -277,6 +277,13 @@ public class Game implements IGame {
             return status == Status.End && typed + mines.length == sum;
         }
 
+        public Duration time() {
+            if (this.status == Status.Init || start == null) return Duration.ZERO;
+            if (status == Status.Running) return Duration.between(start, LocalDateTime.now());
+            if (duration == null) return Duration.ZERO;
+            return duration;
+        }
+
         public Game deserialize() {
             return new Game(
                     gameID,

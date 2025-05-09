@@ -69,20 +69,40 @@ public class SinglePlayerSweeperGameDisplay {
                             .text("""
                                     @%s
                                     Congratulations! 🎉
-                                    You've successfully completed the game in %s seconds.
+                                    You've successfully completed the game in %d seconds.
                                     Map Dimensions: %d × %d
                                     Number of Mines: %d
                                     Well done on your achievement!
                                     """.formatted(
-                                            username, game.duration(),
+                                            username, game.time().toSeconds(),
                                     game.width(), game.height(), game.mines().length)
                             ).build()
             );
+            return;
         }
 
         String command = game.currentStepFlag()? "flag" : "dig";
         List<InlineKeyboardRow> keyboard = new ArrayList<>();
         if (Objects.requireNonNull(game.status()) == IGame.Status.End) {
+            //boom!
+            client.executeAsync(
+                    EditMessageText.builder()
+                            .chatId(chatID)
+                            .messageId(Integer.parseInt(messageID))
+                            .text("""
+                                    @%s
+                                    Boom! 💣
+                                    Unfortunately, you hit a mine and the game has ended.
+                                    Time Elapsed: %d seconds.
+                                    Map Dimensions: %d × %d
+                                    Number of Mines: %d
+                                    Better luck next time!
+                                    """.formatted(
+                                    username, game.time().toSeconds(),
+                                    game.width(), game.height(), game.mines().length)
+                            ).build()
+            );
+
             IUnit[][] units = game.units();
             Step[] mines = game.mines();
             for (int i = 0; i < units.length; i++) {
