@@ -128,12 +128,15 @@ public class SinglePlayerSweeperGameDisplay {
                         switch (num) {
                             case -2 -> row.add(InlineKeyboardButton.builder()
                                     .text("\uD83D\uDEA9")
+                                    .callbackData("empty")
                                     .build());
                             case -1 -> row.add(InlineKeyboardButton.builder()
-                                    .text("  ")
+                                    .text("⬛")
+                                    .callbackData("empty")
                                     .build());
                             default -> row.add(InlineKeyboardButton.builder()
                                     .text(String.valueOf(num))
+                                    .callbackData("empty")
                                     .build());
                         }
                     }
@@ -161,7 +164,7 @@ public class SinglePlayerSweeperGameDisplay {
                                 .callbackData(data)
                                 .build());
                         case -1 -> row.add(InlineKeyboardButton.builder()
-                                .text("  ")
+                                .text("⬛")
                                 .callbackData(data)
                                 .build());
                         default -> row.add(InlineKeyboardButton.builder()
