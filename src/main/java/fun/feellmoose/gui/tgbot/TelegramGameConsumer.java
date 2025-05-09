@@ -51,8 +51,9 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
                                     .filter(s -> !s.isBlank())
                                     .toArray(String[]::new);
                             for (CommandHandler command : commands) {
-                                if (command.getName().equals(args[0]))
-                                    command.handle(message, chat, from, args);
+                                if (command.getName().equals(args[0])
+                                        || (command.getName() + "@MineSweeperPlusBot").equals(args[0])
+                                ) command.handle(message, chat, from, args);
                             }
                         } else if ((message.isTopicMessage()
                                 || message.isGroupMessage()
