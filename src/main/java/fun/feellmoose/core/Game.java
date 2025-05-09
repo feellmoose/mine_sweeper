@@ -279,8 +279,7 @@ public class Game implements IGame {
 
         public Duration time() {
             if (this.status == Status.Init || start == null) return Duration.ZERO;
-            if (status == Status.Running) return Duration.between(start, LocalDateTime.now());
-            if (duration == null) return Duration.ZERO;
+            if (status == Status.Running || duration == null) return Duration.between(start, LocalDateTime.now());
             return duration;
         }
 
