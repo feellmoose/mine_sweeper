@@ -5,6 +5,7 @@ import fun.feellmoose.core.Game;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 public class MemoryRepo<T extends Repo.Identified<T>> implements Repo<T> {
@@ -22,10 +23,10 @@ public class MemoryRepo<T extends Repo.Identified<T>> implements Repo<T> {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
                     DelayedObj<T> delayed = queue.take();
-                    String gameID = delayed.obj.getId();
-                    DelayedObj<T> game = saver.get(gameID);
-                    if (game != null && game.equals(delayed)) {
-                        saver.remove(gameID);
+                    String id = delayed.obj.getId();
+                    DelayedObj<T> obj = saver.get(id);
+                    if (obj != null && obj.equals(delayed)) {
+                        saver.remove(id);
                     }
                 }
             } catch (InterruptedException e) {
@@ -67,7 +68,7 @@ public class MemoryRepo<T extends Repo.Identified<T>> implements Repo<T> {
 
     @Override
     public void save(T obj) {
-        saver.compute(obj.getId(), (key, value) -> {
+        saver.compute(Objects.requireNonNull(obj.getId()), (key, value) -> {
             var next = new MemoryRepo.DelayedObj<>(obj, Duration.ofMillis(ttl));
             queue.add(next);
             return next;
@@ -75,12 +76,14 @@ public class MemoryRepo<T extends Repo.Identified<T>> implements Repo<T> {
     }
 
     @Override
-    public T fetch(String gameID) {
-        return saver.get(gameID).obj;
+    public T fetch(String id) {
+        DelayedObj<T> delayed = saver.get(id);
+        if (delayed == null) return null;
+        return delayed.obj;
     }
 
     @Override
-    public void remove(String gameID) {
-        saver.remove(gameID);
+    public void remove(String id) {
+        saver.remove(id);
     }
 }
