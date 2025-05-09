@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
@@ -83,9 +84,10 @@ public class SinglePlayerSweeperGameDisplay {
 
         String command = game.currentStepFlag()? "flag" : "dig";
         List<InlineKeyboardRow> keyboard = new ArrayList<>();
+
         if (Objects.requireNonNull(game.status()) == IGame.Status.End) {
             //boom!
-            client.executeAsync(
+            client.execute(
                     EditMessageText.builder()
                             .chatId(chatID)
                             .messageId(Integer.parseInt(messageID))
@@ -137,6 +139,14 @@ public class SinglePlayerSweeperGameDisplay {
                 }
                 keyboard.add(row);
             }
+            InlineKeyboardRow row = new InlineKeyboardRow();
+            row.add(
+                    InlineKeyboardButton.builder()
+                            .text("Try again?")
+                            .callbackData("create:8:8:12")
+                            .build()
+            );
+            keyboard.add(row);
         } else {
             for (int i = 0; i < game.units().length; i++) {
                 InlineKeyboardRow row = new InlineKeyboardRow();
@@ -161,26 +171,24 @@ public class SinglePlayerSweeperGameDisplay {
                 }
                 keyboard.add(row);
             }
+            InlineKeyboardRow row = new InlineKeyboardRow();
+            //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
+            String change = "spsg:%s:change:0:0".formatted(game.gameID());
+            String quit = "spsg:%s:quit:0:0".formatted(game.gameID());
+            row.add(
+                    InlineKeyboardButton.builder()
+                            .text(game.currentStepFlag()?"Dig":"Flag")
+                            .callbackData(change)
+                            .build()
+            );
+            row.add(
+                    InlineKeyboardButton.builder()
+                            .text("Quit")
+                            .callbackData(quit)
+                            .build()
+            );
+            keyboard.add(row);
         }
-
-
-        InlineKeyboardRow row = new InlineKeyboardRow();
-        //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
-        String change = "spsg:%s:change:0:0".formatted(game.gameID());
-        String quit = "spsg:%s:quit:0:0".formatted(game.gameID());
-        row.add(
-                InlineKeyboardButton.builder()
-                        .text(game.currentStepFlag()?"Dig":"Flag")
-                        .callbackData(change)
-                        .build()
-        );
-        row.add(
-                InlineKeyboardButton.builder()
-                        .text("Quit")
-                        .callbackData(quit)
-                        .build()
-        );
-        keyboard.add(row);
 
         client.executeAsync(
                 EditMessageReplyMarkup.builder()
