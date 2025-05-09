@@ -77,9 +77,8 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
 
     private void create(String[] args, String userID, String username, String chatID, String messageID) throws GameException, TelegramApiException {
         log.debug("Creating game... {}", Arrays.asList(args));
-        if (gameManager.query(userID, chatID, messageID, null) != null) {
-            //TODO diff from button and other game
-            return;
+        //TODO diff from button and other game
+//        if (gameManager.query(userID, chatID, messageID, null) != null) {
 //            client.execute(
 //                    SendMessage.builder()
 //                            .chatId(chatID)
@@ -90,7 +89,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
 //                                    """.formatted(username))
 //                            .build()
 //            );
-        }
+//        }
         switch (args.length) {
             case 0 -> {
                 //send create guide for user
