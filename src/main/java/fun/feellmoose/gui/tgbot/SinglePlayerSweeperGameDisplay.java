@@ -4,19 +4,20 @@ import fun.feellmoose.core.Game;
 import fun.feellmoose.core.IGame;
 import fun.feellmoose.core.IUnit;
 import fun.feellmoose.core.Step;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 public class SinglePlayerSweeperGameDisplay {
@@ -129,7 +130,7 @@ public class SinglePlayerSweeperGameDisplay {
                                     .text("\uD83D\uDEA9")
                                     .build());
                             case -1 -> row.add(InlineKeyboardButton.builder()
-                                    .text(" ")
+                                    .text("  ")
                                     .build());
                             default -> row.add(InlineKeyboardButton.builder()
                                     .text(String.valueOf(num))
@@ -160,7 +161,7 @@ public class SinglePlayerSweeperGameDisplay {
                                 .callbackData(data)
                                 .build());
                         case -1 -> row.add(InlineKeyboardButton.builder()
-                                .text(" ")
+                                .text("  ")
                                 .callbackData(data)
                                 .build());
                         default -> row.add(InlineKeyboardButton.builder()
@@ -190,7 +191,7 @@ public class SinglePlayerSweeperGameDisplay {
             keyboard.add(row);
         }
 
-        client.executeAsync(
+        client.execute(
                 EditMessageReplyMarkup.builder()
                         .chatId(chatID)
                         .messageId(Integer.parseInt(messageID))
@@ -200,6 +201,9 @@ public class SinglePlayerSweeperGameDisplay {
                                         .build()
                         ).build()
         );
+        if(game.status() == IGame.Status.End) {
+            log.debug("Game ended. Send reply markup success");
+        }
 
     }
 
