@@ -47,7 +47,7 @@ public class ButtonPlayerGameManager {
                     game.steps(),
                     game.mines(),
                     game.flags(),
-                    !game.currentStepFlag(),
+                    game.currentStepFlag(),
                     game.status(),
                     game.typed(),
                     game.start(),
