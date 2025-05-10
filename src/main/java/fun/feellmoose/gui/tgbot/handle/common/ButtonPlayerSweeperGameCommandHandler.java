@@ -74,7 +74,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
     }
 
     private void create(CallbackQuery query, ButtonQueryDataText data) throws GameException, TelegramApiException {
-        if (gameManager.query(data.gameID()) != null) {
+        if (data.gameID() != null && gameManager.query(data.gameID()) != null) {
             client.execute(
                     SendMessage.builder()
                             .chatId(query.getMessage().getChatId())
@@ -85,6 +85,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
                             .build()
             );
         }
+
         if (data.x() == 0 && data.y() == 0 && data.m() == 0) {
             //send create guide for user
             var row = new InlineKeyboardRow();
@@ -113,7 +114,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
             int x = data.x();
             int y = data.y();
             int mines = data.m();
-            if (x < 0 || y < 0 || mines < 0 || x > 8 || y > 8)
+            if (x < 1 || y < 1 || mines < 0 || x > 8 || y > 8)
                 throw new GameException("x, y should be between 0 and 8.");
             Game.SerializedGame game = gameManager.create(x, y, mines);
             display.display(game, query, data);

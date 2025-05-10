@@ -68,7 +68,7 @@ public class ButtonPlayerGameManager {
 
     @NotNull
     private Game.SerializedGame queryNotNull(String gameID) throws GameException {
-        if (gameID != null && !gameID.isEmpty()) return repo.fetch(gameID); {
+        if (gameID != null && !gameID.isEmpty()){
             Game.SerializedGame game = repo.fetch(gameID);
             if (game != null) return game;
         }
