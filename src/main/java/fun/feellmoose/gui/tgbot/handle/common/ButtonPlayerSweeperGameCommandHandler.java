@@ -42,6 +42,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 CallbackQuery query
         )) {
             if (data == null) return;
+            log.info("Received command: {}", data);
             if (!query.getFrom().getId().equals(data.userID())) return;
 
             try {
