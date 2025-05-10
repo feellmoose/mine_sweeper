@@ -248,7 +248,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
                                 break;
                             }
                         }
-                        String str = new ButtonQueryDataText(data.topicID(), data.userID(), data.gameID(), "empty", i, j, 0).getData();
+                        String str = new ButtonQueryDataText(data.topicID(), data.userID(), game.gameID(), "empty", i, j, 0).getData();
                         if (boom.equals(step)) {
                             row.add(InlineKeyboardButton.builder()
                                     .text("\uD83D\uDCA5")
@@ -283,7 +283,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 row.add(
                         InlineKeyboardButton.builder()
                                 .text("Try again?")
-                                .callbackData(new ButtonQueryDataText(data.topicID(), data.userID(), data.gameID(), "create", 8, 8, 10).getData())
+                                .callbackData(new ButtonQueryDataText(data.topicID(), data.userID(), null, "create", 8, 8, 10).getData())
                                 .build()
                 );
                 keyboard.add(row);
@@ -292,7 +292,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
                     InlineKeyboardRow row = new InlineKeyboardRow();
                     for (int j = 0; j < game.units()[i].length; j++) {
                         int num = game.units()[i][j].getFilteredNum();
-                        String str = new ButtonQueryDataText(data.topicID(), data.userID(), data.gameID(), command, i, j, 0).getData();
+                        String str = new ButtonQueryDataText(data.topicID(), data.userID(), game.gameID(), command, i, j, 0).getData();
                         switch (num) {
                             case -2 -> row.add(InlineKeyboardButton.builder()
                                     .text("\uD83D\uDEA9")
@@ -312,8 +312,8 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 }
                 InlineKeyboardRow row = new InlineKeyboardRow();
                 //schema: single-player-sweeper-game:<gameID>:<option>(<x>,<y>)
-                String change = new ButtonQueryDataText(data.topicID(), data.userID(), data.gameID(), "change", 0, 0, 0).getData();
-                String quit = new ButtonQueryDataText(data.topicID(), data.userID(), data.gameID(), "quit", 0, 0, 0).getData();
+                String change = new ButtonQueryDataText(data.topicID(), data.userID(), game.gameID(), "change", 0, 0, 0).getData();
+                String quit = new ButtonQueryDataText(data.topicID(), data.userID(), game.gameID(), "quit", 0, 0, 0).getData();
                 row.add(
                         InlineKeyboardButton.builder()
                                 .text(game.currentStepFlag() ? "Dig" : "Flag")
