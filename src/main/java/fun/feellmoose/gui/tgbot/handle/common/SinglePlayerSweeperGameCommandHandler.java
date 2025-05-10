@@ -6,11 +6,12 @@ import fun.feellmoose.core.Step;
 import fun.feellmoose.gui.tgbot.SinglePlayerSweeperGameDisplay;
 import fun.feellmoose.gui.tgbot.command.InnerBotCommand;
 import fun.feellmoose.gui.tgbot.command.SinglePlayerSweeperGameCommand;
+import fun.feellmoose.muti.ButtonPlayerGameManager;
 import fun.feellmoose.muti.SinglePlayerGameManager;
 import kotlin.random.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -39,23 +40,27 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
         if (command instanceof SinglePlayerSweeperGameCommand(
                 SinglePlayerSweeperGameCommand.Type type,
                 String[] args,
-                String userID,
-                String username,
-                String chatID,
-                String chatName,
-                String messageID,
+                Message message,
                 String gameID
         )) {
             log.debug("Received command: {}", command);
+
+            User user = message.getFrom();
+            String userID = user.getId().toString();
+            String username = user.getUserName();
+            String chatID = message.getChatId().toString();
+            String messageID = message.getMessageId().toString();
+            Integer threadID = message.getMessageThreadId();
+            String topicID = threadID == null ? "" : threadID.toString();
+
             try {
                 try {
                     switch (type) {
-                        case create -> create(args, userID, username, chatID, messageID);
+                        case create -> create(args, userID, username, chatID, messageID, topicID);
                         case dig -> dig(args, userID, username, chatID, messageID, gameID);
                         case flag -> flag(args, userID, username, chatID, messageID, gameID);
                         case quit -> quit(args, userID, username, chatID, messageID, gameID);
                         case help -> help(args, userID, username, chatID);
-                        case change -> change(args, userID, username, chatID, messageID, gameID);
                     }
                 } catch (GameException e) {
                     client.execute(
@@ -75,7 +80,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
         }
     }
 
-    private void create(String[] args, String userID, String username, String chatID, String messageID) throws GameException, TelegramApiException {
+    private void create(String[] args, String userID, String username, String chatID, String messageID, String topicID) throws GameException, TelegramApiException {
         log.debug("Creating game... {}", Arrays.asList(args));
         if (gameManager.query(userID, chatID, null, null) != null) {
             client.execute(
@@ -92,7 +97,14 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
         switch (args.length) {
             case 0 -> {
                 //send create guide for user
-                Message message = client.execute(
+                var row = new InlineKeyboardRow();
+                row.add(
+                        InlineKeyboardButton.builder()
+                                .text("Started With Button")
+                                .callbackData("bsg:%s:%s:create:8:8:10".formatted(topicID,userID))
+                                .build()
+                );
+                client.executeAsync(
                         SendMessage.builder()
                                 .chatId(chatID)
                                 .text("""
@@ -100,24 +112,11 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                                         Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
                                         Ready to play? Just follow the steps below to start a new game.
                                         """.formatted(username))
-                                .build()
-                );
-                var row = new InlineKeyboardRow();
-                row.add(
-                        InlineKeyboardButton.builder()
-                                .text("Classic Game")
-                                .callbackData("create:8:8:10")
-                                .build()
-                );
-                client.execute(
-                        EditMessageReplyMarkup.builder()
-                                .chatId(message.getChatId())
-                                .messageId(message.getMessageId())
                                 .replyMarkup(InlineKeyboardMarkup.builder()
-                                        .keyboard(List.of(
-                                                row
-                                        )).build()
-                                ).build()
+                                                .keyboard(List.of(
+                                                        row
+                                                )).build())
+                                .build()
                 );
             }
             case 1 -> {
@@ -157,12 +156,6 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
             }
             default -> throw new GameException("Command args too long.");
         }
-    }
-
-    private void change(String[] args, String userID, String username, String chatID, String messageID, String gameID) throws GameException, TelegramApiException {
-        log.debug("Change game options mod... {}", Arrays.asList(args));
-        Game.SerializedGame game = gameManager.change(userID, chatID, messageID, gameID);
-        display.display(game, userID, username, chatID, messageID);
     }
 
     private void dig(String[] args, String userID, String username, String chatID, String messageID, String gameID) throws GameException, TelegramApiException {

@@ -58,11 +58,7 @@ public class SingleGameCommandHandlers {
             handlers.handle(new SinglePlayerSweeperGameCommand(
                     SinglePlayerSweeperGameCommand.Type.create,
                     arguments,
-                    from.getId().toString(),
-                    from.getUserName(),
-                    chat.getId().toString(),
-                    chat.getTitle(),
-                    null,
+                    message,
                     null
             ));
         }
@@ -86,11 +82,7 @@ public class SingleGameCommandHandlers {
             handlers.handle(new SinglePlayerSweeperGameCommand(
                     SinglePlayerSweeperGameCommand.Type.dig,
                     arguments,
-                    from.getId().toString(),
-                    from.getUserName(),
-                    chat.getId().toString(),
-                    chat.getTitle(),
-                    null,
+                    message,
                     null
             ));
         }
@@ -115,11 +107,7 @@ public class SingleGameCommandHandlers {
             handlers.handle(new SinglePlayerSweeperGameCommand(
                     SinglePlayerSweeperGameCommand.Type.flag,
                     arguments,
-                    from.getId().toString(),
-                    from.getUserName(),
-                    chat.getId().toString(),
-                    chat.getTitle(),
-                    null,
+                    message,
                     null
             ));
         }
@@ -144,11 +132,7 @@ public class SingleGameCommandHandlers {
             handlers.handle(new SinglePlayerSweeperGameCommand(
                     SinglePlayerSweeperGameCommand.Type.quit,
                     arguments,
-                    from.getId().toString(),
-                    from.getUserName(),
-                    chat.getId().toString(),
-                    chat.getTitle(),
-                    null,
+                    message,
                     null
             ));
         }
@@ -172,11 +156,7 @@ public class SingleGameCommandHandlers {
             handlers.handle(new SinglePlayerSweeperGameCommand(
                     SinglePlayerSweeperGameCommand.Type.help,
                     arguments,
-                    from.getId().toString(),
-                    from.getUserName(),
-                    chat.getId().toString(),
-                    chat.getTitle(),
-                    null,
+                    message,
                     null
             ));
         }

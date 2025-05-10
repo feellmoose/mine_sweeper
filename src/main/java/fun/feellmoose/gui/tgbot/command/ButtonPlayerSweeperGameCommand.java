@@ -1,12 +1,14 @@
 package fun.feellmoose.gui.tgbot.command;
 
+
+import fun.feellmoose.gui.tgbot.command.data.ButtonQueryDataText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
-public record SinglePlayerSweeperGameCommand(
-        Type type,
+public record ButtonPlayerSweeperGameCommand(
+        ButtonQueryDataText text,
         String[] args,
-        Message message,
-        String gameID
+        CallbackQuery callbackQuery
 ) implements InnerBotCommand {
 
     @Override public String title() {
@@ -15,7 +17,7 @@ public record SinglePlayerSweeperGameCommand(
 
     @Override
     public String command() {
-        return type.command;
+        return text.getType().command;
     }
 
     public enum Type{
@@ -23,12 +25,14 @@ public record SinglePlayerSweeperGameCommand(
         dig("/dig"),
         flag("/flag"),
         quit("/quit"),
-        help("/help");
+        change("/change");
         private final String command;
 
         Type(String command) {
             this.command = command;
         }
     }
+
+
 
 }
