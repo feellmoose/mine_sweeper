@@ -111,7 +111,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                         int length = Random.Default.nextInt(1, 8);
                         double random = Random.Default.nextDouble(0, 0.9);
                         //filter to limit num smaller
-                        int mines = (int) (Math.pow(random, 10) * Math.pow(length, 2) / 2);
+                        int mines = (int) (Math.pow(random, 2) * Math.pow(length, 2) / 2);
                         startButton(threadID, userID, chatID, username,length,length,mines);
                     }
                     case "level" -> {
