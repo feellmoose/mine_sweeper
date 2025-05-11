@@ -55,6 +55,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
                         case change -> change(query, data);
                     }
                 } catch (GameException e) {
+                    log.error("Error while button game opt", e);
                     client.execute(
                             SendMessage.builder()
                                     .chatId(query.getMessage().getChatId())

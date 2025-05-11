@@ -163,8 +163,8 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 if (args[0].equals("level")) {
                     switch (args[1]) {
                         case "easy" -> startButton(threadID, userID, chatID, username, 6, 6, 5);
-                        case "normal" -> startButton(threadID, userID, chatID, messageID, 8, 8, 9);
-                        case "hard" -> startButton(threadID, userID, chatID, messageID, 8, 8, 12);
+                        case "normal" -> startButton(threadID, userID, chatID, username, 8, 8, 9);
+                        case "hard" -> startButton(threadID, userID, chatID, username, 8, 8, 12);
                         default -> throw new GameException("Game level should be 'easy', 'normal', or 'hard'");
                     }
                 }
@@ -176,7 +176,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                     int mine = Integer.parseInt(args[2]);
                     if (x < 0 || y < 0 || mine < 0 || x > 8 || y > 8 || mine > 32)
                         throw new GameException("x, y and mine num should be between 0 and 8.");
-                    startButton(threadID, userID, chatID, messageID, x, y, mine);
+                    startButton(threadID, userID, chatID, username, x, y, mine);
                 } catch (NumberFormatException e) {
                     throw new GameException("x, y and mine num should be a number.");
                 }
