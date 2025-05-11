@@ -12,9 +12,14 @@ import fun.feellmoose.muti.MemoryRepo;
 import fun.feellmoose.muti.Repo;
 import fun.feellmoose.muti.ButtonPlayerGameManager;
 import fun.feellmoose.muti.SinglePlayerGameManager;
+import fun.feellmoose.utils.RandomUtils;
+import kotlin.random.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 
 @Slf4j
 public class Main {

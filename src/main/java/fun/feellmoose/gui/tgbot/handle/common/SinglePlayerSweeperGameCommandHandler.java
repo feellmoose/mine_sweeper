@@ -6,6 +6,7 @@ import fun.feellmoose.gui.tgbot.command.InnerBotCommand;
 import fun.feellmoose.gui.tgbot.command.SinglePlayerSweeperGameCommand;
 import fun.feellmoose.gui.tgbot.command.data.ButtonQueryDataText;
 import fun.feellmoose.muti.SinglePlayerGameManager;
+import fun.feellmoose.utils.RandomUtils;
 import kotlin.random.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -21,6 +22,8 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 
 @Slf4j
 public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHandler {
@@ -108,10 +111,19 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
             case 1 -> {
                 switch (args[0]) {
                     case "random" -> {
-                        int length = Random.Default.nextInt(1, 8);
-                        double random = Random.Default.nextDouble(0, 0.9);
-                        //filter to limit num smaller
-                        int mines = (int) (Math.pow(random, 2) * Math.pow(length, 2) / 2);
+                        int length = ThreadLocalRandom.current().nextInt(3, 8);
+                        int total = length * length;
+
+                        Function<Double,Double> refactor = (raw) -> {
+                            if (raw > 0.8) return Math.pow(raw, 3.0);
+                            if (raw < 0.2) return Math.pow(raw, 0.5);
+                            return raw;
+                        };
+
+                        double density = RandomUtils.randomDensity(0.15, 0.35, refactor);
+
+                        int mines = (int) (density * total);
+
                         startButton(threadID, userID, chatID, username,length,length,mines);
                     }
                     case "level" -> {
