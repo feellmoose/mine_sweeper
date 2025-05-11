@@ -91,7 +91,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
             var row = new InlineKeyboardRow();
             row.add(
                     InlineKeyboardButton.builder()
-                            .text("Started With Button")
+                            .text("Classic")
                             .callbackData(new ButtonQueryDataText(data.topicID(), data.userID(), data.gameID(), "create", 8, 8, 10).getData())
                             .build()
             );

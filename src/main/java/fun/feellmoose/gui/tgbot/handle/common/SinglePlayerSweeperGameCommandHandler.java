@@ -23,12 +23,10 @@ import java.util.*;
 @Slf4j
 public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHandler {
 
-    private final SinglePlayerGameManager gameManager;
     private final TelegramClient client;
     private final Displayer display;
 
-    public SinglePlayerSweeperGameCommandHandler(SinglePlayerGameManager gameManager, TelegramClient client) {
-        this.gameManager = gameManager;
+    public SinglePlayerSweeperGameCommandHandler(TelegramClient client) {
         this.client = client;
         this.display = new Displayer(client);
     }
@@ -44,7 +42,7 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
             log.debug("Received command: {}", command);
 
             User user = message.getFrom();
-            String userID = user.getId().toString();
+            Long userID = user.getId();
             String username = user.getUserName();
             String chatID = message.getChatId().toString();
             String messageID = message.getMessageId().toString();
@@ -54,9 +52,6 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 try {
                     switch (type) {
                         case create -> create(args, userID, username, chatID, messageID, threadID);
-                        case dig -> dig(args, userID, username, chatID, messageID, gameID, threadID);
-                        case flag -> flag(args, userID, username, chatID, messageID, gameID, threadID);
-                        case quit -> quit(args, userID, username, chatID, messageID, gameID, threadID);
                         case help -> help(args, userID, username, chatID, threadID);
                     }
                 } catch (GameException e) {
@@ -78,29 +73,17 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
         }
     }
 
-    private void create(String[] args, String userID, String username, String chatID, String messageID, Integer threadID) throws GameException, TelegramApiException {
+    private void create(String[] args, Long userID, String username, String chatID, String messageID, Integer threadID) throws GameException, TelegramApiException {
         log.debug("Creating game... {}", Arrays.asList(args));
-        if (gameManager.query(userID, chatID, null, null) != null) {
-            client.execute(
-                    SendMessage.builder()
-                            .chatId(chatID)
-                            .text("""
-                                    @%s
-                                    🎮 A game is currently active in this chat!
-                                    To end it early, type '/quit' or '/admin quit'.
-                                    """.formatted(username))
-                            .build()
-            );
-        }
         switch (args.length) {
             case 0 -> {
                 //send create guide for user
                 var row = new InlineKeyboardRow();
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text("Started With Button")
+                                .text("Classic")
                                 .callbackData(new ButtonQueryDataText(
-                                        threadID, Long.valueOf(userID), null, "create", 8, 8, 10
+                                        threadID, userID, null, "create", 8, 8, 10
                                 ).getData())
                                 .build()
                 );
@@ -121,25 +104,67 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 );
             }
             case 1 -> {
-                if (args[0].equals("random")) {
-                    int length = Random.Default.nextInt(1, 52);
-                    double random = Random.Default.nextDouble(0, 1);
-                    //filter to limit num smaller
-                    int num = (int) (Math.pow(random, 10) * Math.pow(length, 2) / 2);
-                    Game.SerializedGame game = gameManager.create(userID, chatID, messageID, length, length, num);
-                    display.display(game, userID, username, chatID, messageID,threadID);
+                switch (args[0]) {
+                    case "random" -> {
+                        int length = Random.Default.nextInt(1, 8);
+                        double random = Random.Default.nextDouble(0, 0.9);
+                        //filter to limit num smaller
+                        int mines = (int) (Math.pow(random, 10) * Math.pow(length, 2) / 2);
+                        startButton(threadID, userID, chatID, username,length,length,mines);
+                    }
+                    case "level" -> {
+                        var row = new InlineKeyboardRow();
+                        row.add(
+                                InlineKeyboardButton.builder()
+                                        .text("Easy")
+                                        .callbackData(new ButtonQueryDataText(
+                                                threadID, userID, null, "create", 6, 6, 5
+                                        ).getData())
+                                        .build()
+                        );
+                        row.add(
+                                InlineKeyboardButton.builder()
+                                        .text("Normal")
+                                        .callbackData(new ButtonQueryDataText(
+                                                threadID, userID, null, "create",8, 8, 10
+                                        ).getData())
+                                        .build()
+                        );
+                        row.add(
+                                InlineKeyboardButton.builder()
+                                        .text("Hard")
+                                        .callbackData(new ButtonQueryDataText(
+                                                threadID, userID, null, "create", 8, 8, 14
+                                        ).getData())
+                                        .build()
+                        );
+                        client.executeAsync(
+                                SendMessage.builder()
+                                        .chatId(chatID)
+                                        .messageThreadId(threadID)
+                                        .text("""
+                                        @%s
+                                        Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
+                                        Please choose level to start a new game.
+                                        """.formatted(username))
+                                        .replyMarkup(InlineKeyboardMarkup.builder()
+                                                .keyboard(List.of(
+                                                        row
+                                                )).build())
+                                        .build()
+                        );
+
+                    }
                 }
             }
             case 2 -> {
                 if (args[0].equals("level")) {
-                    Game.SerializedGame game;
                     switch (args[1]) {
-                        case "easy" -> game = gameManager.create(userID, chatID, messageID, 9, 9, 10);
-                        case "normal" -> game = gameManager.create(userID, chatID, messageID, 16, 16, 40);
-                        case "hard" -> game = gameManager.create(userID, chatID, messageID, 25, 25, 99);
+                        case "easy" -> startButton(threadID, userID, chatID, username, 6, 6, 5);
+                        case "normal" -> startButton(threadID, userID, chatID, messageID, 8, 8, 9);
+                        case "hard" -> startButton(threadID, userID, chatID, messageID, 8, 8, 12);
                         default -> throw new GameException("Game level should be 'easy', 'normal', or 'hard'");
                     }
-                    display.display(game, userID, username, chatID, messageID,threadID);
                 }
             }
             case 3 -> {
@@ -147,10 +172,9 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                     int x = Integer.parseInt(args[0]);
                     int y = Integer.parseInt(args[1]);
                     int mine = Integer.parseInt(args[2]);
-                    if (x < 0 || y < 0 || mine < 0 || x > 52 || y > 52 || mine > 52)
-                        throw new GameException("x, y and mine num should be between 0 and 52.");
-                    Game.SerializedGame game = gameManager.create(userID, chatID, messageID, x, y, mine);
-                    display.display(game, userID, username, chatID, messageID,threadID);
+                    if (x < 0 || y < 0 || mine < 0 || x > 8 || y > 8 || mine > 32)
+                        throw new GameException("x, y and mine num should be between 0 and 8.");
+                    startButton(threadID, userID, chatID, messageID, x, y, mine);
                 } catch (NumberFormatException e) {
                     throw new GameException("x, y and mine num should be a number.");
                 }
@@ -159,45 +183,34 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
         }
     }
 
-    private void dig(String[] args, String userID, String username, String chatID, String messageID, String gameID, Integer threadID) throws GameException, TelegramApiException {
-        log.debug("Dig option... {}", Arrays.asList(args));
-        if (args.length != 2) throw new GameException("Command args length has to be 2.");
-        try {
-            int x = Integer.parseInt(args[0]);
-            int y = Integer.parseInt(args[1]);
-            Game.SerializedGame game = gameManager.dig(userID, chatID, messageID, gameID, new Step(x, y));
-            display.display(game, userID, username, chatID, messageID,threadID);
-            if (game.isWin()) gameManager.quit(userID, chatID, messageID, gameID);
-        } catch (NumberFormatException e) {
-            throw new GameException("x, y and mine num should be a number.");
-        }
+    private void startButton(Integer threadID, Long userID, String chatID, String username, int x, int y, int mine) throws GameException, TelegramApiException {
+        var row = new InlineKeyboardRow();
+        row.add(
+                InlineKeyboardButton.builder()
+                        .text("Started With Button")
+                        .callbackData(new ButtonQueryDataText(
+                                threadID, userID, null, "create", x, y, mine
+                        ).getData())
+                        .build()
+        );
+        client.executeAsync(
+                SendMessage.builder()
+                        .chatId(chatID)
+                        .messageThreadId(threadID)
+                        .text("""
+                                        @%s
+                                        Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
+                                        You have started a new %d × %d game with %d mines.
+                                        """.formatted(username,x,y,mine))
+                        .replyMarkup(InlineKeyboardMarkup.builder()
+                                .keyboard(List.of(
+                                        row
+                                )).build())
+                        .build()
+        );
     }
 
-    private void flag(String[] args, String userID, String username, String chatID, String messageID, String gameID, Integer threadID) throws GameException, TelegramApiException {
-        log.debug("Flag option... {}", Arrays.asList(args));
-        if (args.length != 2) throw new GameException("Command args length has to be 2.");
-        try {
-            int x = Integer.parseInt(args[0]);
-            int y = Integer.parseInt(args[1]);
-            Game.SerializedGame game = gameManager.flag(userID, chatID, messageID, gameID, new Step(x, y));
-            display.display(game, userID, username, chatID, messageID,threadID);
-        } catch (NumberFormatException e) {
-            throw new GameException("x, y and mine num should be a number.");
-        }
-    }
-
-    private void quit(String[] args, String userID, String username, String chatID, String messageID, String gameID, Integer threadID) throws GameException, TelegramApiException {
-        log.debug("Quit option... {}", Arrays.asList(args));
-        gameManager.quit(userID, chatID, messageID, gameID);
-        String str = "@" + username + " quit game success!";
-        client.executeAsync(SendMessage.builder()
-                .chatId(chatID)
-                .messageThreadId(threadID)
-                .text(str)
-                .build());
-    }
-
-    private void help(String[] args, String userID, String username, String chatID, Integer threadID) throws GameException, TelegramApiException {
+    private void help(String[] args, Long userID, String username, String chatID, Integer threadID) throws GameException, TelegramApiException {
         log.debug("Help option... {}", Arrays.asList(args));
         client.executeAsync(SendMessage.builder()
                 .chatId(chatID)
@@ -207,8 +220,8 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                         Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
                         Here's a list of commands to get you started:
                         
-                        /create Create a new single person game with guide.
-                        /create <width> <height> <mine> Create width × height single person game, witch could be controlled by button(if size smaller than 8 × 8).
+                        /create Create a default game.
+                        /create <width> <height> <mine> Create width × height game with mines.
                         /help List commands.
                         
                         Mine Sweeper Bot Plus
@@ -438,79 +451,6 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                             ).build()
             );
 
-        }
-
-        private void classicView(Game.SerializedGame game, String userID, String username, String chatID,Integer threadID) throws TelegramApiException {
-            try {
-                if (game.isWin()) {
-                    client.executeAsync(SendMessage.builder()
-                            .chatId(chatID)
-                            .messageThreadId(threadID)
-                            .text("\uD83C\uDF89")
-                            .build());
-                }
-
-                StringBuilder str = new StringBuilder();
-
-                str.append("@").append(username).append("\n");
-                str.append("Game start time: ").append(game.start()).append("\n");
-                str.append("Game state: ").append(game.status()).append("\n");
-                str.append("\n");
-
-                if (Objects.requireNonNull(game.status()) == IGame.Status.End) {
-                    IUnit[][] units = game.units();
-                    Step[] mines = game.mines();
-                    for (int i = 0; i < units.length; i++) {
-                        for (int j = 0; j < units[i].length; j++) {
-                            boolean contains = false;
-                            Step step = new Step(i, j);
-                            for (Step mine : mines) {
-                                if (mine.equals(step)) {
-                                    contains = true;
-                                    break;
-                                }
-                            }
-                            if (contains) {
-                                str.append("* ");
-                            } else {
-                                int num = units[i][j].getFilteredNum();
-                                switch (num) {
-                                    case -2 -> str.append("F ");
-                                    case -1 -> str.append(". ");
-                                    default -> str.append(num).append(" ");
-                                }
-                            }
-                        }
-                        str.append("\n");
-                    }
-                } else {
-                    for (IUnit[] unit : game.units()) {
-                        for (IUnit iUnit : unit) {
-                            int num = iUnit.getFilteredNum();
-                            switch (num) {
-                                case -2 -> str.append("F ");
-                                case -1 -> str.append(". ");
-                                default -> str.append(num).append(" ");
-                            }
-                        }
-                        str.append("\n");
-                    }
-                }
-
-                client.executeAsync(SendMessage.builder()
-                        .chatId(chatID)
-                        .messageThreadId(threadID)
-                        .text(str.toString())
-                        .build());
-            } catch (TelegramApiException e) {
-                log.error("Error display game for user@{} in chat@{}", username, chatID, e);
-            }
-        }
-
-        public void display(Game.SerializedGame game, String userID, String username, String chatID, String messageID, Integer threadID) throws TelegramApiException {
-            if (game.width() < 9 && game.height() < 9) buttonView(game, userID, username, chatID, messageID, threadID);
-//        else buttonView(game, userID, username, chatID);
-            else classicView(game, userID, username, chatID, threadID);
         }
 
 
