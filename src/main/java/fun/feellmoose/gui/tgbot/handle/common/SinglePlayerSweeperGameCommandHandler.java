@@ -1,6 +1,7 @@
 package fun.feellmoose.gui.tgbot.handle.common;
 
 import fun.feellmoose.core.*;
+import fun.feellmoose.gui.tgbot.TelegramBotGame;
 import fun.feellmoose.gui.tgbot.command.InnerBotCommand;
 import fun.feellmoose.gui.tgbot.command.SinglePlayerSweeperGameCommand;
 import fun.feellmoose.gui.tgbot.command.data.ButtonQueryDataText;
@@ -18,6 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -221,12 +223,14 @@ public class SinglePlayerSweeperGameCommandHandler implements InnerBotCommandHan
                         Here's a list of commands to get you started:
                         
                         /create Create a default game.
+                        /create random Create random n × n game with random mines.
+                        /create level [level] Create diff level game.
                         /create <width> <height> <mine> Create width × height game with mines.
                         /help List commands.
                         
-                        Mine Sweeper Bot Plus
-                        version v0.0.1
-                        """.formatted(username))
+                        Mine Sweeper Bot Plus created By feellmoose.
+                        version %s last update at %s
+                        """.formatted(username, TelegramBotGame.version, TelegramBotGame.updateAt.format(DateTimeFormatter.ISO_DATE_TIME)))
                 .build());
         //@%s
         //                        Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!

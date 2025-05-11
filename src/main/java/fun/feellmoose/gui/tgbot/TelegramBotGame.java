@@ -10,12 +10,15 @@ import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
 @Slf4j
 public class TelegramBotGame {
+    public static final String version = "v0.0.2";
+    public static final LocalDateTime updateAt = LocalDateTime.now();
 
     private final String botToken;
     private final TelegramBotsLongPollingApplication application = new TelegramBotsLongPollingApplication();

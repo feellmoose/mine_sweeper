@@ -26,17 +26,13 @@ public class Main {
         log.debug("Loaded telegram bot token: [{}]", botToken);
 
         Repo<Game.SerializedGame> repo = new MemoryRepo<>();
-        Repo<SinglePlayerGameManager.AdditionalGameInfo> additional = new MemoryRepo<>();
 
-        SinglePlayerGameManager singlePlayerGameManager = new SinglePlayerGameManager(repo,additional);
         ButtonPlayerGameManager buttonPlayerGameManager = new ButtonPlayerGameManager(repo);
         OkHttpTelegramClient client = new OkHttpTelegramClient(botToken);
 
-
         InnerBotCommandHandlers innerBotCommandHandlers = new InnerBotCommandHandlers()
                 .register(new ButtonPlayerSweeperGameCommandHandler(buttonPlayerGameManager, client))
-                .register(new SinglePlayerSweeperGameCommandHandler(singlePlayerGameManager, client));
-
+                .register(new SinglePlayerSweeperGameCommandHandler(client));
 
         SingleGameCommandHandlers singleGameCommandHandlers = new SingleGameCommandHandlers(innerBotCommandHandlers);
         ButtonPlayerSweeperGameCallbackHandler buttonPlayerSweeperGameCallbackHandler = new ButtonPlayerSweeperGameCallbackHandler(innerBotCommandHandlers,client);
