@@ -285,7 +285,7 @@ public class ButtonPlayerSweeperGameCommandHandler implements InnerBotCommandHan
                 row.add(
                         InlineKeyboardButton.builder()
                                 .text("Try again?")
-                                .callbackData(new ButtonQueryDataText(data.topicID(), data.userID(), null, "create", 8, 8, 10).getData())
+                                .callbackData(new ButtonQueryDataText(data.topicID(), data.userID(), null, "create", game.width(), game.height(), game.mines().length).getData())
                                 .build()
                 );
                 keyboard.add(row);
