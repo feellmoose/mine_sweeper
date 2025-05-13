@@ -1,19 +1,14 @@
 package fun.feellmoose;
 
 import fun.feellmoose.bots.game.mine.TelegramBotMineGameApp;
-import fun.feellmoose.bots.game.mine.handle.TelegramBotMineGameCallbackQueryHandler;
-import fun.feellmoose.game.mine.core.Game;
+import fun.feellmoose.bots.handler.HelpCommandHandler;
+import fun.feellmoose.bots.handler.mine.MineCommandHandler;
+import fun.feellmoose.bots.handler.mine.MineLevelCommandHandler;
+import fun.feellmoose.bots.handler.mine.MineRandomCommandHandler;
+import fun.feellmoose.bots.handler.mine.TelegramBotMineGameCallbackQueryHandler;
 import fun.feellmoose.game.mine.core.GameException;
-import fun.feellmoose.user.tgbot.TelegramBotGame;
-import fun.feellmoose.user.tgbot.handle.common.ButtonPlayerSweeperGameCommandHandler;
-import fun.feellmoose.user.tgbot.handle.common.InnerBotCommandHandlers;
-import fun.feellmoose.user.tgbot.handle.common.SinglePlayerSweeperGameCommandHandler;
-import fun.feellmoose.user.tgbot.handle.telegram.MineCreateCommandHandler;
-import fun.feellmoose.user.tgbot.handle.telegram.SingleGameCommandHandlers;
-import fun.feellmoose.user.tgbot.handle.telegram.ButtonPlayerSweeperGameCallbackHandler;
-import fun.feellmoose.muti.repo.MemoryRepo;
-import fun.feellmoose.muti.repo.Repo;
-import fun.feellmoose.muti.ButtonPlayerGameManager;
+import fun.feellmoose.repo.MemoryRepo;
+import fun.feellmoose.bots.TelegramBotGame;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -27,32 +22,19 @@ public class Main {
 
         log.debug("Loaded telegram bot token: [{}]", botToken);
 
-        Repo<Game.SerializedGame> repo = new MemoryRepo<>();
-
-        ButtonPlayerGameManager buttonPlayerGameManager = new ButtonPlayerGameManager(repo);
         OkHttpTelegramClient client = new OkHttpTelegramClient(botToken);
-
-        InnerBotCommandHandlers innerBotCommandHandlers = new InnerBotCommandHandlers()
-                .register(new ButtonPlayerSweeperGameCommandHandler(buttonPlayerGameManager, client))
-                .register(new SinglePlayerSweeperGameCommandHandler(client));
-
-        SingleGameCommandHandlers singleGameCommandHandlers = new SingleGameCommandHandlers(innerBotCommandHandlers);
-        ButtonPlayerSweeperGameCallbackHandler buttonPlayerSweeperGameCallbackHandler = new ButtonPlayerSweeperGameCallbackHandler(innerBotCommandHandlers,client);
-
         TelegramBotMineGameApp app = new TelegramBotMineGameApp(new MemoryRepo<>());
-        TelegramBotMineGameCallbackQueryHandler handler = new TelegramBotMineGameCallbackQueryHandler(app,client);
-        MineCreateCommandHandler commandHandler = new MineCreateCommandHandler(client);
 
         log.info("Starting TelegramBot Game..");
 
         TelegramBotGame game = TelegramBotGame.builder()
                 .botToken(botToken)
                 .client(client)
-                .registerCallbackQueryHandler(buttonPlayerSweeperGameCallbackHandler)
-                .registerCallbackQueryHandler(handler)
-                .registerCommandHandler(singleGameCommandHandlers.create())
-                .registerCommandHandler(singleGameCommandHandlers.help())
-                .registerCommandHandler(commandHandler)
+                .registerCallbackQueryHandler(new TelegramBotMineGameCallbackQueryHandler(app, client))
+                .registerCommandHandler(new MineCommandHandler(client))
+                .registerCommandHandler(new MineLevelCommandHandler(client))
+                .registerCommandHandler(new MineRandomCommandHandler(client))
+                .registerCommandHandler(new HelpCommandHandler(client))
                 .build();
         try {
             game.start();

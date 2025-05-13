@@ -1,6 +1,6 @@
 package fun.feellmoose.bots.game;
 
-import fun.feellmoose.muti.repo.Repo;
+import fun.feellmoose.repo.Repo;
 import fun.feellmoose.utils.RandomUtils;
 
 public interface GenID {

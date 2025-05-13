@@ -1,8 +1,8 @@
-package fun.feellmoose.user.tgbot;
+package fun.feellmoose.bots;
 
-import fun.feellmoose.user.tgbot.handle.telegram.CallbackQueryHandler;
-import fun.feellmoose.user.tgbot.handle.telegram.ChatHandler;
-import fun.feellmoose.user.tgbot.handle.telegram.CommandHandler;
+import fun.feellmoose.bots.handler.CallbackQueryHandler;
+import fun.feellmoose.bots.handler.ChatHandler;
+import fun.feellmoose.bots.handler.CommandHandler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;

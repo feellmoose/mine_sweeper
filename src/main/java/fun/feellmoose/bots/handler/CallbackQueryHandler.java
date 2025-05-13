@@ -1,4 +1,4 @@
-package fun.feellmoose.user.tgbot.handle.telegram;
+package fun.feellmoose.bots.handler;
 
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 

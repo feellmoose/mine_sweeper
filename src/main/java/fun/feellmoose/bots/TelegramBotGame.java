@@ -1,9 +1,9 @@
-package fun.feellmoose.user.tgbot;
+package fun.feellmoose.bots;
 
 import fun.feellmoose.game.mine.core.GameException;
-import fun.feellmoose.user.tgbot.handle.telegram.CallbackQueryHandler;
-import fun.feellmoose.user.tgbot.handle.telegram.ChatHandler;
-import fun.feellmoose.user.tgbot.handle.telegram.CommandHandler;
+import fun.feellmoose.bots.handler.CallbackQueryHandler;
+import fun.feellmoose.bots.handler.ChatHandler;
+import fun.feellmoose.bots.handler.CommandHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Slf4j
 public class TelegramBotGame {
-    public static final String version = "v0.0.2";
+    public static final String version = "v0.1.0";
     public static final LocalDateTime updateAt = LocalDateTime.now();
 
     private final String botToken;

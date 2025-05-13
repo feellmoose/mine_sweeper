@@ -1,4 +1,4 @@
-package fun.feellmoose.bots.game.mine.handle;
+package fun.feellmoose.bots.command.mine;
 
 import org.jetbrains.annotations.Nullable;
 

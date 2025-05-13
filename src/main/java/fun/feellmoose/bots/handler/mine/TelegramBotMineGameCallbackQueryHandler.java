@@ -1,10 +1,12 @@
-package fun.feellmoose.bots.game.mine.handle;
+package fun.feellmoose.bots.handler.mine;
 
+import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryCommand;
+import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
 import fun.feellmoose.bots.game.mine.BotMineGame;
 import fun.feellmoose.bots.game.mine.TelegramBotMineGame;
 import fun.feellmoose.bots.game.mine.TelegramBotMineGameApp;
 import fun.feellmoose.game.mine.core.GameException;
-import fun.feellmoose.user.tgbot.handle.telegram.CallbackQueryHandler;
+import fun.feellmoose.bots.handler.CallbackQueryHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

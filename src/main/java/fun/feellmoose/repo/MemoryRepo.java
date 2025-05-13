@@ -1,4 +1,4 @@
-package fun.feellmoose.muti.repo;
+package fun.feellmoose.repo;
 
 import org.jetbrains.annotations.NotNull;
 

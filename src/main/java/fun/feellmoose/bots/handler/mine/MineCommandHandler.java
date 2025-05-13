@@ -1,9 +1,7 @@
-package fun.feellmoose.user.tgbot.handle.telegram;
+package fun.feellmoose.bots.handler.mine;
 
-import fun.feellmoose.bots.game.mine.handle.TelegramBotMineGameCallbackQueryCommand;
-import fun.feellmoose.bots.game.mine.handle.TelegramBotMineGameCallbackQueryData;
-import fun.feellmoose.bots.game.mine.handle.TelegramBotMineGameCallbackQueryHandler;
-import fun.feellmoose.user.tgbot.command.data.ButtonQueryDataText;
+import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
+import fun.feellmoose.bots.handler.CommandHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -18,11 +16,11 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import java.util.List;
 
 @Slf4j
-public class MineCreateCommandHandler implements CommandHandler {
+public class MineCommandHandler implements CommandHandler {
 
     private final TelegramClient client;
 
-    public MineCreateCommandHandler(TelegramClient client) {
+    public MineCommandHandler(TelegramClient client) {
         this.client = client;
     }
 

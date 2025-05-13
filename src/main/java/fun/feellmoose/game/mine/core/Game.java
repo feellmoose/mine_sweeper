@@ -1,6 +1,6 @@
 package fun.feellmoose.game.mine.core;
 
-import fun.feellmoose.muti.repo.Repo;
+import fun.feellmoose.repo.Repo;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

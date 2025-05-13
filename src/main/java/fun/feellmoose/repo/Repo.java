@@ -1,4 +1,4 @@
-package fun.feellmoose.muti.repo;
+package fun.feellmoose.repo;
 
 public interface Repo<T extends Repo.Identified<T>> {
 
