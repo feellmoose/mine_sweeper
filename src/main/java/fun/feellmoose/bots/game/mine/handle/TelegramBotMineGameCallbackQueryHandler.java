@@ -245,6 +245,71 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                                                 .build()
                                 ).build()
                 );
+            } else if (game.status() == BotMineGame.GameStatus.UnInit) {
+                List<InlineKeyboardRow> keyboard = new ArrayList<>();
+                TelegramBotMineGameCallbackQueryData.Action action = switch (additional.button()) {
+                    case Click -> TelegramBotMineGameCallbackQueryData.Action.create;
+                    case Flag -> TelegramBotMineGameCallbackQueryData.Action.flag;
+                };
+                for (int i = 0; i < game.width(); i++) {
+                    InlineKeyboardRow row = new InlineKeyboardRow();
+                    for (int j = 0; j < game.height(); j++) {
+                        String callback = new TelegramBotMineGameCallbackQueryData(
+                                data.topicID(),
+                                game.id(),
+                                data.userID(),
+                                action,
+                                i, j, 0
+                        ).data();
+                        row.add(InlineKeyboardButton.builder()
+                                .text("ㅤ")
+                                .callbackData(callback)
+                                .build());
+                    }
+                    keyboard.add(row);
+                }
+                InlineKeyboardRow row = new InlineKeyboardRow();
+                TelegramBotMineGameApp.Additional.Button next = switch (additional.button()) {
+                    case Click -> TelegramBotMineGameApp.Additional.Button.Flag;
+                    case Flag -> TelegramBotMineGameApp.Additional.Button.Click;
+                };
+                String change = new TelegramBotMineGameCallbackQueryData(
+                        data.topicID(),
+                        game.id(),
+                        data.userID(),
+                        TelegramBotMineGameCallbackQueryData.Action.change,
+                        0, 0, 0
+                ).data();
+                String quit = new TelegramBotMineGameCallbackQueryData(
+                        data.topicID(),
+                        game.id(),
+                        data.userID(),
+                        TelegramBotMineGameCallbackQueryData.Action.quit,
+                        0, 0, 0
+                ).data();
+                row.add(
+                        InlineKeyboardButton.builder()
+                                .text(next.name())
+                                .callbackData(change)
+                                .build()
+                );
+                row.add(
+                        InlineKeyboardButton.builder()
+                                .text("Quit")
+                                .callbackData(quit)
+                                .build()
+                );
+                keyboard.add(row);
+                client.execute(
+                        EditMessageReplyMarkup.builder()
+                                .chatId(message.getChatId())
+                                .messageId(message.getMessageId())
+                                .replyMarkup(
+                                        InlineKeyboardMarkup.builder()
+                                                .keyboard(keyboard)
+                                                .build()
+                                ).build()
+                );
             } else {
                 List<InlineKeyboardRow> keyboard = new ArrayList<>();
                 BotMineGame.Box[][] boxes = game.boxes();

@@ -96,6 +96,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 @Nullable LocalDateTime start,
                 @Nullable LocalDateTime end
         )) {
+            if (status == BotMineGame.GameStatus.UnInit) return this;
             Box box = boxes[position.x()][position.y()];
             if (win || box.isClicked() || box.isFlagged() || status == GameStatus.End) return this;
             History[] current = new History[history.length + 1];
@@ -209,6 +210,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 @Nullable LocalDateTime end
         )) {
             Box box = boxes[position.x()][position.y()];
+            if (status == BotMineGame.GameStatus.UnInit) return this;
             if (win || box.isClicked() || status != GameStatus.Running) return this;
 
             History[] current = new History[history.length + 1];
@@ -256,6 +258,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                         @Nullable LocalDateTime start,
                         @Nullable LocalDateTime end
                 )) {
+                    if (status == BotMineGame.GameStatus.UnInit) yield  this;
                     Position position = history.position();
                     Box box = boxes[position.x()][position.y()];
                     if (win || box.isClicked() || status == GameStatus.End) yield this;
@@ -301,6 +304,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 @Nullable LocalDateTime start,
                 @Nullable LocalDateTime end
         )) {
+            if (status == BotMineGame.GameStatus.UnInit) return this;
             LocalDateTime nUpdate;
             History[] current;
             if (history.length > s) {
@@ -382,7 +386,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
         @Override
         public Duration duration() {
             return switch (status) {
-                case Init -> Duration.ZERO;
+                case UnInit, Init -> Duration.ZERO;
                 case Running -> Duration.between(
                         Optional.ofNullable(start).orElse(LocalDateTime.now()),
                         LocalDateTime.now()
@@ -422,7 +426,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                     new Box[0][0],
                     new History[0],
                     false,
-                    GameStatus.Init,
+                    GameStatus.UnInit,
                     LocalDateTime.now(),
                     null,
                     null,
@@ -432,6 +436,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
 
         public TelegramBotMineGame start(TelegramBotMineGame empty) {
+            if (empty.status() != GameStatus.UnInit) return empty;
             if (empty.boxes().length == 0) {
                 var serialized = empty.data;
                 int width = serialized.width;
@@ -492,6 +497,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
 
         public TelegramBotMineGame start(TelegramBotMineGame empty, BotMineGame.Position position) {
+            if (empty.status() != GameStatus.UnInit) return empty;
             if (empty.boxes().length == 0) {
                 var serialized = empty.data;
                 int width = serialized.width;

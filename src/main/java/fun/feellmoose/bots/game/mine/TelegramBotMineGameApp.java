@@ -124,7 +124,7 @@ public class TelegramBotMineGameApp {
     public TelegramBotMineGame dig(String gameID, BotMineGame.Position position) throws GameException {
         TelegramBotMineGame game = queryNotNull(gameID);
         var saved = switch (game.status()) {
-            case Init -> factory.start(game, position);
+            case UnInit -> factory.start(game, position);
             default -> game.onClicked(position);
         };
         repo.save(saved.serialize());
@@ -134,6 +134,7 @@ public class TelegramBotMineGameApp {
     @NotNull
     public TelegramBotMineGame flag(String gameID, BotMineGame.Position position) throws GameException {
         TelegramBotMineGame game = queryNotNull(gameID);
+        if (game.status() == BotMineGame.GameStatus.UnInit) return game;
         var saved = game.onFlagged(position);
         repo.save(saved.serialize());
         return saved;
@@ -142,6 +143,7 @@ public class TelegramBotMineGameApp {
     @NotNull
     public TelegramBotMineGame rollback(String gameID, int n) throws GameException {
         TelegramBotMineGame game = queryNotNull(gameID);
+        if (game.status() == BotMineGame.GameStatus.UnInit) return game;
         var saved = game.onRollback(n);
         repo.save(saved.serialize());
         return saved;

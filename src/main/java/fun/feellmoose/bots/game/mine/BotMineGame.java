@@ -49,7 +49,7 @@ public interface BotMineGame<T extends BotMineGame<T>> extends Game {
     }
 
     enum GameStatus {
-        Init, Running, End
+        UnInit, Init, Running, End
     }
 
     enum GameOption {
