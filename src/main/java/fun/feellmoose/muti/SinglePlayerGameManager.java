@@ -1,9 +1,10 @@
 package fun.feellmoose.muti;
 
-import fun.feellmoose.core.Game;
-import fun.feellmoose.core.GameException;
-import fun.feellmoose.core.IGame;
-import fun.feellmoose.core.Step;
+import fun.feellmoose.game.mine.core.Game;
+import fun.feellmoose.game.mine.core.GameException;
+import fun.feellmoose.game.mine.core.IGame;
+import fun.feellmoose.game.mine.core.Step;
+import fun.feellmoose.muti.repo.Repo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +22,7 @@ public class SinglePlayerGameManager {
             String chatID,
             String messageID) implements Repo.Identified<AdditionalGameInfo> {
         @Override
-        public String getId() {
+        public String id() {
             return switch (type){
                 case button -> "u%s_c%s_m%s".formatted(userID, chatID, messageID);
                 case picture -> "u%s_c%s".formatted(userID, chatID);
