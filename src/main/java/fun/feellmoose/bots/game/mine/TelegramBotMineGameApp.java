@@ -150,7 +150,6 @@ public class TelegramBotMineGameApp {
     }
 
     public void quit(String gameID) throws GameException {
-        TelegramBotMineGame game = queryNotNull(gameID);
-        repo.remove(game.id());
+        if (gameID != null && !gameID.isEmpty()) repo.remove(gameID);
     }
 }
