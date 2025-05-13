@@ -122,6 +122,11 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                     History[] related  = clickedZero(width,height,position,boxes);
                     clicked += related.length;
                     current[history.length] = new History(position, GameOption.Click, now,related);
+                    for (History h : related) {
+                        int x = h.position().x();
+                        int y = h.position().y();
+                        nBoxes[x][y] = boxes[x][y].clicked();
+                    }
                 } else {
                     current[history.length] = new History(position, GameOption.Click, now,null);
                 }
@@ -164,20 +169,22 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
         while (!require.isEmpty()) {
             List<Position> next = new LinkedList<>();
             for (Position p : require) {
-                if (!visited.contains(p)) continue;
+                if (visited.contains(p)) continue;
                 Box box = boxes[p.x()][p.y()];
                 if (box.isClicked() || box.isFlagged() || box.isMine()) continue;
                 history.add(new History(p, GameOption.Click, null,null));
                 visited.add(p);
                 if (box.num() == 0) {
-                    next.add(new Position(x - 1, y - 1));
-                    next.add(new Position(x + 1, y - 1));
-                    next.add(new Position(x - 1, y + 1));
-                    next.add(new Position(x + 1, y + 1));
-                    next.add(new Position(x - 1, y));
-                    next.add(new Position(x, y - 1));
-                    next.add(new Position(x + 1, y));
-                    next.add(new Position(x, y + 1));
+                    int px = p.x();
+                    int py = p.y();
+                    next.add(new Position(px - 1, py - 1));
+                    next.add(new Position(px + 1, py - 1));
+                    next.add(new Position(px - 1, py + 1));
+                    next.add(new Position(px + 1, py + 1));
+                    next.add(new Position(px - 1, py));
+                    next.add(new Position(px, py - 1));
+                    next.add(new Position(px + 1, py));
+                    next.add(new Position(px, py + 1));
                 }
             }
             require = next.stream()
@@ -505,14 +512,14 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
                 Box[][] boxes = new Box[width][height];
 
-                List<Integer> nums = IntStream.range(0, width * height + 1)
+                List<Integer> nums = IntStream.range(0, width * height)
                         .boxed()
                         .collect(Collectors.toList());
 
                 int x = position.x();
                 int y = position.y();
 
-                List<Integer> listA = Stream.of(
+                List<Integer> listA = Stream.of(position,
                                 new Position(x + 1, y),
                                 new Position(x - 1, y),
                                 new Position(x, y + 1),
@@ -556,10 +563,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                                         new Position(i - 1, j),
                                         new Position(i, j + 1),
                                         new Position(i, j - 1))
-                                .filter(p -> {
-                                    Box box = boxes[p.x()][p.y()];
-                                    return p.check(width, height) && box != null && box.isMine();
-                                })
+                                .filter(p -> p.check(width, height) && boxes[p.x()][p.y()] != null && boxes[p.x()][p.y()].isMine())
                                 .count();
                         boxes[i][j] = Box.num(num);
                     }
@@ -581,7 +585,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                         null,
                         LocalDateTime.now(),
                         null
-                ));
+                )).onClicked(position);
             }
             return empty;
         }
