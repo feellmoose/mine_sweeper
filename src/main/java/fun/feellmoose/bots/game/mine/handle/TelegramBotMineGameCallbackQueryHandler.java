@@ -248,7 +248,7 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
             } else if (game.status() == BotMineGame.GameStatus.UnInit) {
                 List<InlineKeyboardRow> keyboard = new ArrayList<>();
                 TelegramBotMineGameCallbackQueryData.Action action = switch (additional.button()) {
-                    case Click -> TelegramBotMineGameCallbackQueryData.Action.create;
+                    case Click -> TelegramBotMineGameCallbackQueryData.Action.dig;
                     case Flag -> TelegramBotMineGameCallbackQueryData.Action.flag;
                 };
                 for (int i = 0; i < game.width(); i++) {
@@ -314,7 +314,7 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                 List<InlineKeyboardRow> keyboard = new ArrayList<>();
                 BotMineGame.Box[][] boxes = game.boxes();
                 TelegramBotMineGameCallbackQueryData.Action action = switch (additional.button()) {
-                    case Click -> TelegramBotMineGameCallbackQueryData.Action.create;
+                    case Click -> TelegramBotMineGameCallbackQueryData.Action.dig;
                     case Flag -> TelegramBotMineGameCallbackQueryData.Action.flag;
                 };
                 for (int i = 0; i < game.width(); i++) {
