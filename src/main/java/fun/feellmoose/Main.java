@@ -49,10 +49,10 @@ public class Main {
                 .botToken(botToken)
                 .client(client)
                 .registerCallbackQueryHandler(buttonPlayerSweeperGameCallbackHandler)
-                .removerCallbackQueryHandler(handler)
+                .registerCallbackQueryHandler(handler)
                 .registerCommandHandler(singleGameCommandHandlers.create())
                 .registerCommandHandler(singleGameCommandHandlers.help())
-                .removeCommandHandler(commandHandler)
+                .registerCommandHandler(commandHandler)
                 .build();
         try {
             game.start();

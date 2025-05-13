@@ -72,7 +72,7 @@ public class TelegramBotGame {
             return this;
         }
 
-        public TelegramBotGameBuilder removerCallbackQueryHandler(CallbackQueryHandler callbackQueryHandler) {
+        public TelegramBotGameBuilder removeCallbackQueryHandler(CallbackQueryHandler callbackQueryHandler) {
             callbacks.remove(callbackQueryHandler);
             return this;
         }
@@ -83,7 +83,7 @@ public class TelegramBotGame {
             return this;
         }
 
-        public TelegramBotGameBuilder removerChatHandler(ChatHandler chatHandler) {
+        public TelegramBotGameBuilder removeChatHandler(ChatHandler chatHandler) {
             chats.remove(chatHandler);
             return this;
         }
