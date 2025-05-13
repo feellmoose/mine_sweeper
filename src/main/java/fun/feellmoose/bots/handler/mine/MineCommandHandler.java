@@ -78,7 +78,7 @@ public class MineCommandHandler implements CommandHandler {
             var row = new InlineKeyboardRow();
             row.add(
                     InlineKeyboardButton.builder()
-                            .text("Started In Classic")
+                            .text("Classic")
                             .callbackData(new TelegramBotMineGameCallbackQueryData(
                                     threadID,
                                     null,

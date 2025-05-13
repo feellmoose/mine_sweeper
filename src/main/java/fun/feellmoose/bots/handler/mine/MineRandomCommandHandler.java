@@ -29,7 +29,7 @@ public class MineRandomCommandHandler implements CommandHandler {
 
     @Override
     public String getName() {
-        return "/mine-random";
+        return "/mine_random";
     }
 
     @Override

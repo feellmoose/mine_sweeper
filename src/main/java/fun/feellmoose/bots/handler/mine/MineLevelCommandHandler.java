@@ -26,7 +26,7 @@ public class MineLevelCommandHandler implements CommandHandler {
 
     @Override
     public String getName() {
-        return "/mine-level";
+        return "/mine_level";
     }
 
     @Override

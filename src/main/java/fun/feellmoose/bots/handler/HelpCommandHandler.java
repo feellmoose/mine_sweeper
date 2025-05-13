@@ -37,8 +37,8 @@ public class HelpCommandHandler implements CommandHandler {
                             Here's a list of commands to get you started:
                             
                             /mine [<width> <height> <mine>]
-                            /mine-random
-                            /mine-level [level]
+                            /mine_random
+                            /mine_level [level]
                             /help
                             
                             > Mine Sweeper Bot Plus created By feellmoose.
