@@ -180,9 +180,9 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                 );
                 List<InlineKeyboardRow> keyboard = new ArrayList<>();
                 BotMineGame.Box[][] boxes = game.boxes();
-                for (int i = 0; i < boxes.length; i++) {
+                for (int i = 0; i < game.width(); i++) {
                     InlineKeyboardRow row = new InlineKeyboardRow();
-                    for (int j = 0; j < boxes[i].length; j++) {
+                    for (int j = 0; j < game.height(); j++) {
                         BotMineGame.Box box = boxes[i][j];
                         String callback = new TelegramBotMineGameCallbackQueryData(
                                 data.topicID(),
@@ -317,9 +317,9 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                     case Click -> TelegramBotMineGameCallbackQueryData.Action.create;
                     case Flag -> TelegramBotMineGameCallbackQueryData.Action.flag;
                 };
-                for (int i = 0; i < boxes.length; i++) {
+                for (int i = 0; i < game.width(); i++) {
                     InlineKeyboardRow row = new InlineKeyboardRow();
-                    for (int j = 0; j < boxes[i].length; j++) {
+                    for (int j = 0; j < game.height(); j++) {
                         BotMineGame.Box box = boxes[i][j];
                         String callback = new TelegramBotMineGameCallbackQueryData(
                                 data.topicID(),
