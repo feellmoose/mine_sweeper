@@ -19,6 +19,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHandler {
     private final TelegramBotMineGameApp app;
@@ -36,6 +37,7 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
         var data = command.data();
         TelegramBotMineGame game = null;
         try {
+            if (!Objects.equals(command.data().userID(), query.getFrom().getId())) return;
             game = switch (data.action()) {
                 case create -> app.create(
                         query.getFrom().getId(),
