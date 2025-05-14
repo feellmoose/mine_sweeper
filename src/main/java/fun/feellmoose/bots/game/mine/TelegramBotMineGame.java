@@ -451,7 +451,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
                 Box[][] boxes = new Box[width][height];
 
-                List<Integer> nums = IntStream.range(0, width * height + 1)
+                List<Integer> nums = IntStream.range(0, width * height)
                         .boxed()
                         .collect(Collectors.toList());
                 Collections.shuffle(nums);
@@ -472,11 +472,11 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                                 new Position(i - 1, j),
                                 new Position(i, j + 1),
                                 new Position(i, j - 1))
+                                .filter(p -> p.check(width, height))
                                 .filter(p -> {
                                     Box box = boxes[p.x()][p.y()];
-                                    return p.check(width, height) && box != null && box.isMine();
-                                })
-                                .count();
+                                    return  box != null && box.isMine();
+                                }).count();
                         boxes[i][j] = Box.num(num);
                     }
                 }
@@ -563,8 +563,11 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                                         new Position(i - 1, j),
                                         new Position(i, j + 1),
                                         new Position(i, j - 1))
-                                .filter(p -> p.check(width, height) && boxes[p.x()][p.y()] != null && boxes[p.x()][p.y()].isMine())
-                                .count();
+                                .filter(p -> p.check(width, height) )
+                                .filter(p -> {
+                                    Box box = boxes[p.x()][p.y()];
+                                    return box != null && box.isMine();
+                                }).count();
                         boxes[i][j] = Box.num(num);
                     }
                 }
