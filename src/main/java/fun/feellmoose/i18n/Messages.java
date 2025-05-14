@@ -8,7 +8,7 @@ public class Messages {
     public static final Locale LOCALE_CN_CXG = new Locale.Builder()
             .setLanguage("zh")
             .setRegion("CN")
-            .setVariant("CXG")
+            .setVariant("CiXioGui")
             .build();
 
     public record MessageString(String template) {
