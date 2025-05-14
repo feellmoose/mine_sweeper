@@ -1,7 +1,10 @@
 package fun.feellmoose.bots.handler.mine;
 
+import fun.feellmoose.bots.TelegramBotGame;
 import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
 import fun.feellmoose.bots.handler.CommandHandler;
+import fun.feellmoose.i18n.Messages;
+import fun.feellmoose.utils.LocaleUtils;
 import fun.feellmoose.utils.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -15,6 +18,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
@@ -53,9 +57,10 @@ public class MineRandomCommandHandler implements CommandHandler {
 
     private void startClassic(Message message, Chat chat, User from, int x, int y, int mine) throws TelegramApiException {
         var row = new InlineKeyboardRow();
+        Locale locale = LocaleUtils.fromString(from.getLanguageCode());
         row.add(
                 InlineKeyboardButton.builder()
-                        .text("Classic")
+                        .text(Messages.load("game.mine.start.button", locale).formatted())
                         .callbackData(new TelegramBotMineGameCallbackQueryData(
                                 message.getMessageThreadId(),
                                 null,
@@ -69,11 +74,7 @@ public class MineRandomCommandHandler implements CommandHandler {
                 SendMessage.builder()
                         .chatId(chat.getId())
                         .messageThreadId(message.getMessageThreadId())
-                        .text("""
-                                        @%s
-                                        Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
-                                        You have started a new %d × %d game with %d mines.
-                                        """.formatted(from.getUserName(),x,y,mine))
+                        .text(Messages.load("game.mine.start.note", locale).formatted(TelegramBotGame.version, from.getUserName(),x,y,mine))
                         .replyMarkup(InlineKeyboardMarkup.builder()
                                 .keyboard(List.of(
                                         row

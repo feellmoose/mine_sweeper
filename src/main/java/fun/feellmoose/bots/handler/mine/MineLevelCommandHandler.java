@@ -1,7 +1,10 @@
 package fun.feellmoose.bots.handler.mine;
 
+import fun.feellmoose.bots.TelegramBotGame;
 import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
 import fun.feellmoose.bots.handler.CommandHandler;
+import fun.feellmoose.i18n.Messages;
+import fun.feellmoose.utils.LocaleUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -14,6 +17,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 public class MineLevelCommandHandler implements CommandHandler {
@@ -31,6 +35,7 @@ public class MineLevelCommandHandler implements CommandHandler {
 
     @Override
     public void handle(Message message, Chat chat, User from, String[] args) {
+        Locale locale = LocaleUtils.fromString(from.getLanguageCode());
         switch (args.length) {
             case 2 -> {
                 try {
@@ -40,7 +45,7 @@ public class MineLevelCommandHandler implements CommandHandler {
                         case "hard" -> startClassic(message,chat,from,8,8,13);
                         default -> client.execute(
                                 SendMessage.builder()
-                                        .text("@%s Game level should be 'easy', 'normal', or 'hard'".formatted(from.getUserName()))
+                                        .text("@%s [level]: 'easy', 'normal', or 'hard'".formatted(from.getUserName()))
                                         .chatId(chat.getId())
                                         .messageThreadId(message.getMessageThreadId())
                                         .build()
@@ -54,7 +59,7 @@ public class MineLevelCommandHandler implements CommandHandler {
                 var row = new InlineKeyboardRow();
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text("Easy")
+                                .text(Messages.load("game.mine.start.level.easy", locale).formatted())
                                 .callbackData(new TelegramBotMineGameCallbackQueryData(
                                         message.getMessageThreadId(),
                                         null,
@@ -66,7 +71,7 @@ public class MineLevelCommandHandler implements CommandHandler {
                 );
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text("Normal")
+                                .text(Messages.load("game.mine.start.level.normal", locale).formatted())
                                 .callbackData(new TelegramBotMineGameCallbackQueryData(
                                         message.getMessageThreadId(),
                                         null,
@@ -78,7 +83,7 @@ public class MineLevelCommandHandler implements CommandHandler {
                 );
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text("Hard")
+                                .text(Messages.load("game.mine.start.level.hard", locale).formatted())
                                 .callbackData(new TelegramBotMineGameCallbackQueryData(
                                         message.getMessageThreadId(),
                                         null,
@@ -93,11 +98,7 @@ public class MineLevelCommandHandler implements CommandHandler {
                             SendMessage.builder()
                                     .chatId(message.getChatId())
                                     .messageThreadId(message.getMessageThreadId())
-                                    .text("""
-                                            @%s
-                                            Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
-                                            Please choose level to start a new game.
-                                            """.formatted(from.getUserName()))
+                                    .text(Messages.load("game.mine.menu", locale).formatted(TelegramBotGame.version,from.getUserName()))
                                     .replyMarkup(InlineKeyboardMarkup.builder()
                                             .keyboard(List.of(
                                                     row
@@ -113,9 +114,10 @@ public class MineLevelCommandHandler implements CommandHandler {
 
     private void startClassic(Message message, Chat chat, User from, int x, int y, int mine) throws TelegramApiException {
         var row = new InlineKeyboardRow();
+        Locale locale = LocaleUtils.fromString(from.getLanguageCode());
         row.add(
                 InlineKeyboardButton.builder()
-                        .text("Classic")
+                        .text(Messages.load("game.mine.start.button", locale).formatted())
                         .callbackData(new TelegramBotMineGameCallbackQueryData(
                                 message.getMessageThreadId(),
                                 null,
@@ -129,11 +131,7 @@ public class MineLevelCommandHandler implements CommandHandler {
                 SendMessage.builder()
                         .chatId(chat.getId())
                         .messageThreadId(message.getMessageThreadId())
-                        .text("""
-                                        @%s
-                                        Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
-                                        You have started a new %d × %d game with %d mines.
-                                        """.formatted(from.getUserName(),x,y,mine))
+                        .text(Messages.load("game.mine.start.note", locale).formatted(TelegramBotGame.version,from.getUserName(),x,y,mine))
                         .replyMarkup(InlineKeyboardMarkup.builder()
                                 .keyboard(List.of(
                                         row

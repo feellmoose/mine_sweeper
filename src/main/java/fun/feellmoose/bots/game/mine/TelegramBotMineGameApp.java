@@ -4,10 +4,12 @@ package fun.feellmoose.bots.game.mine;
 import fun.feellmoose.bots.game.GenID;
 import fun.feellmoose.game.mine.core.GameException;
 import fun.feellmoose.repo.Repo;
+import fun.feellmoose.utils.LocaleUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,6 +26,7 @@ public class TelegramBotMineGameApp {
     public record Additional(
             @NotNull GameType type,
             @NotNull Button button,
+            Locale locale,
             Integer topic,
             Long chat,
             Integer message
@@ -42,6 +45,7 @@ public class TelegramBotMineGameApp {
             Map<String, String> res = new HashMap<>();
             res.put("type", type.name());
             res.put("button", button.name());
+            res.put("locale", LocaleUtils.toString(locale));
             if (topic != null) res.put("topic", topic.toString());
             if (chat != null) res.put("chat", chat.toString());
             if (message != null) res.put("message", message.toString());
@@ -55,6 +59,7 @@ public class TelegramBotMineGameApp {
             return new Additional(
                     GameType.valueOf(map.get("type")),
                     Button.valueOf(map.get("button")),
+                    LocaleUtils.fromString(map.get("locale")),
                     message == null ? null : Integer.parseInt(message),
                     chat == null ? null : Long.parseLong(chat),
                     topic == null ? null : Integer.parseInt(topic)

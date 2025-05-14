@@ -1,6 +1,8 @@
 package fun.feellmoose.bots.handler;
 
 import fun.feellmoose.bots.TelegramBotGame;
+import fun.feellmoose.i18n.Messages;
+import fun.feellmoose.utils.LocaleUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -31,20 +33,8 @@ public class HelpCommandHandler implements CommandHandler {
             client.executeAsync(SendMessage.builder()
                     .chatId(chat.getId())
                     .messageThreadId(message.getMessageThreadId())
-                    .text("""
-                            @%s
-                            Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
-                            Here's a list of commands to get you started:
-                            
-                            /mine [<width> <height> <mine>]
-                            /mine_random
-                            /mine_level [level]
-                            /help
-                            
-                            > Mine Sweeper Bot Plus created By feellmoose.
-                            > Version %s
-                            > Last update at %s
-                            """.formatted(from.getUserName(), TelegramBotGame.version, TelegramBotGame.updateAt.format(DateTimeFormatter.ISO_DATE_TIME)))
+                    .text(Messages.load("game.help", LocaleUtils.fromString(from.getLanguageCode()))
+                            .formatted(from.getUserName(), TelegramBotGame.version, TelegramBotGame.updateAt.format(DateTimeFormatter.ISO_DATE_TIME)))
                     .build());
         } catch (TelegramApiException e) {
             log.error("Error while sending message to Mine Sweeper Bot", e);

@@ -1,7 +1,10 @@
 package fun.feellmoose.bots.handler.mine;
 
+import fun.feellmoose.bots.TelegramBotGame;
 import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
 import fun.feellmoose.bots.handler.CommandHandler;
+import fun.feellmoose.i18n.Messages;
+import fun.feellmoose.utils.LocaleUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -14,6 +17,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 public class MineCommandHandler implements CommandHandler {
@@ -36,12 +40,13 @@ public class MineCommandHandler implements CommandHandler {
         String username = user.getUserName();
         String chatID = message.getChatId().toString();
         Integer threadID = message.getMessageThreadId();
+        Locale locale = LocaleUtils.fromString(from.getLanguageCode());
         if (args.length == 1) {
             //send create guide for user
             var row = new InlineKeyboardRow();
             row.add(
                     InlineKeyboardButton.builder()
-                            .text("Classic")
+                            .text(Messages.load("game.mine.start.button", locale).formatted())
                             .callbackData(
                                     new TelegramBotMineGameCallbackQueryData(
                                             threadID,
@@ -57,11 +62,7 @@ public class MineCommandHandler implements CommandHandler {
                         SendMessage.builder()
                                 .chatId(chatID)
                                 .messageThreadId(threadID)
-                                .text("""
-                                            @%s
-                                            Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus test.v2!
-                                            Ready to play? Just follow the steps below to start a new game.
-                                            """.formatted(username))
+                                .text(Messages.load("game.mine.menu", locale).formatted(TelegramBotGame.version,username))
                                 .replyMarkup(InlineKeyboardMarkup.builder()
                                         .keyboard(List.of(
                                                 row
@@ -78,7 +79,7 @@ public class MineCommandHandler implements CommandHandler {
             var row = new InlineKeyboardRow();
             row.add(
                     InlineKeyboardButton.builder()
-                            .text("Classic")
+                            .text(Messages.load("game.mine.start.button", locale).formatted())
                             .callbackData(new TelegramBotMineGameCallbackQueryData(
                                     threadID,
                                     null,
@@ -93,11 +94,7 @@ public class MineCommandHandler implements CommandHandler {
                         SendMessage.builder()
                                 .chatId(chatID)
                                 .messageThreadId(threadID)
-                                .text("""
-                                            @%s
-                                            Hey there! 👋 Thanks for choosing Mine Sweeper Bot Plus!
-                                            You have started a new %d × %d game with %d mines.
-                                            """.formatted(username,x,y,m))
+                                .text(Messages.load("game.mine.start.note", locale).formatted(TelegramBotGame.version,username,x,y,m))
                                 .replyMarkup(InlineKeyboardMarkup.builder()
                                         .keyboard(List.of(
                                                 row

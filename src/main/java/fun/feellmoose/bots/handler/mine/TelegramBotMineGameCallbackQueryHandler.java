@@ -7,6 +7,8 @@ import fun.feellmoose.bots.game.mine.TelegramBotMineGame;
 import fun.feellmoose.bots.game.mine.TelegramBotMineGameApp;
 import fun.feellmoose.game.mine.core.GameException;
 import fun.feellmoose.bots.handler.CallbackQueryHandler;
+import fun.feellmoose.i18n.Messages;
+import fun.feellmoose.utils.LocaleUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -46,6 +48,7 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                         new TelegramBotMineGameApp.Additional(
                                 TelegramBotMineGameApp.Additional.GameType.Classic_Bottom,
                                 TelegramBotMineGameApp.Additional.Button.Click,
+                                LocaleUtils.fromString(query.getFrom().getLanguageCode()),
                                 data.topicID(),
                                 query.getMessage().getChatId(),
                                 query.getMessage().getMessageId()
@@ -90,6 +93,9 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                 );
                 return;
             }
+            if (game.width() > 8 || game.height() > 8) {
+                throw new GameException("Classic View only support width and height between 0 and 8");
+            }
             TelegramBotMineGameApp.Additional additional = TelegramBotMineGameApp.Additional.fromMap(game.serialize().infos());
             switch (additional.type()) {
                 case Classic_Bottom, Level_Bottom, Random_Bottom ->
@@ -112,10 +118,8 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                                 SendMessage.builder()
                                         .chatId(additional.chat())
                                         .messageThreadId(additional.topic())
-                                        .text("""
-                                                @%s Oops! Something went wrong!
-                                                %s
-                                                """.formatted(query.getFrom().getUserName(), exception.getMessage()))
+                                        .text(Messages.load("game.mine.error", additional.locale())
+                                                .formatted(query.getFrom().getUserName(), exception.getMessage()))
                                         .build()
                         );
                     } catch (TelegramApiException e) {
@@ -134,14 +138,7 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                         EditMessageText.builder()
                                 .chatId(message.getChatId())
                                 .messageId(message.getMessageId())
-                                .text("""
-                                        @%s
-                                        Congratulations! 🎉
-                                        You've successfully completed the game in %d.%d seconds.
-                                        Map Dimensions: %d × %d
-                                        Number of Mines: %d
-                                        Well done on your achievement!
-                                        """.formatted(
+                                .text(Messages.load("game.mine.win.note", additional.locale()).formatted(
                                         query.getFrom().getUserName(),
                                         game.duration().toSeconds(),
                                         game.duration().toMillisPart(),
@@ -165,15 +162,7 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                         EditMessageText.builder()
                                 .chatId(message.getChatId())
                                 .messageId(message.getMessageId())
-                                .text("""
-                                        @%s
-                                        Boom! 💣
-                                        Unfortunately, you hit a mine and the game has ended.
-                                        Time Elapsed: %d.%d seconds.
-                                        Map Dimensions: %d × %d
-                                        Number of Mines: %d
-                                        Better luck next time!
-                                        """.formatted(
+                                .text(Messages.load("game.mine.lose.note", additional.locale()).formatted(
                                         query.getFrom().getUserName(),
                                         game.duration().toSeconds(),
                                         game.duration().toMillisPart(),
@@ -234,7 +223,7 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                 ).data();
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text("Try again?")
+                                .text(Messages.load("game.mine.lose.button", additional.locale()).formatted())
                                 .callbackData(retry)
                                 .build()
                 );
@@ -273,9 +262,9 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                     keyboard.add(row);
                 }
                 InlineKeyboardRow row = new InlineKeyboardRow();
-                TelegramBotMineGameApp.Additional.Button next = switch (additional.button()) {
-                    case Click -> TelegramBotMineGameApp.Additional.Button.Flag;
-                    case Flag -> TelegramBotMineGameApp.Additional.Button.Click;
+                Messages.MessageString next = switch (additional.button()) {
+                    case Click -> Messages.load("game.mine.opt.flag", additional.locale());
+                    case Flag -> Messages.load("game.mine.opt.click", additional.locale());
                 };
                 String change = new TelegramBotMineGameCallbackQueryData(
                         data.topicID(),
@@ -293,13 +282,13 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                 ).data();
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text(next.name())
+                                .text(next.formatted())
                                 .callbackData(change)
                                 .build()
                 );
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text("Quit")
+                                .text(Messages.load("game.mine.opt.quit", additional.locale()).formatted())
                                 .callbackData(quit)
                                 .build()
                 );
@@ -352,9 +341,9 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                     keyboard.add(row);
                 }
                 InlineKeyboardRow row = new InlineKeyboardRow();
-                TelegramBotMineGameApp.Additional.Button next = switch (additional.button()) {
-                    case Click -> TelegramBotMineGameApp.Additional.Button.Flag;
-                    case Flag -> TelegramBotMineGameApp.Additional.Button.Click;
+                Messages.MessageString next = switch (additional.button()) {
+                    case Click -> Messages.load("game.mine.opt.flag", additional.locale());
+                    case Flag -> Messages.load("game.mine.opt.click", additional.locale());
                 };
                 String change = new TelegramBotMineGameCallbackQueryData(
                         data.topicID(),
@@ -372,13 +361,13 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                 ).data();
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text(next.name())
+                                .text(next.formatted())
                                 .callbackData(change)
                                 .build()
                 );
                 row.add(
                         InlineKeyboardButton.builder()
-                                .text("Quit")
+                                .text(Messages.load("game.mine.opt.quit", additional.locale()).formatted())
                                 .callbackData(quit)
                                 .build()
                 );
