@@ -2,10 +2,7 @@ package fun.feellmoose;
 
 import fun.feellmoose.bots.game.mine.TelegramBotMineGameApp;
 import fun.feellmoose.bots.handler.HelpCommandHandler;
-import fun.feellmoose.bots.handler.mine.MineCommandHandler;
-import fun.feellmoose.bots.handler.mine.MineLevelCommandHandler;
-import fun.feellmoose.bots.handler.mine.MineRandomCommandHandler;
-import fun.feellmoose.bots.handler.mine.TelegramBotMineGameCallbackQueryHandler;
+import fun.feellmoose.bots.handler.mine.*;
 import fun.feellmoose.game.mine.core.GameException;
 import fun.feellmoose.repo.MemoryRepo;
 import fun.feellmoose.bots.TelegramBotGame;
@@ -35,6 +32,7 @@ public class Main {
                 .registerCommandHandler(new MineLevelCommandHandler(client))
                 .registerCommandHandler(new MineRandomCommandHandler(client))
                 .registerCommandHandler(new HelpCommandHandler(client))
+                .registerCommandHandler(new CXGCommandHandler(client))
                 .build();
         try {
             game.start();

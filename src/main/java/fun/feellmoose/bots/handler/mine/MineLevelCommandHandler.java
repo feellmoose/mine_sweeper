@@ -98,7 +98,7 @@ public class MineLevelCommandHandler implements CommandHandler {
                             SendMessage.builder()
                                     .chatId(message.getChatId())
                                     .messageThreadId(message.getMessageThreadId())
-                                    .text(Messages.load("game.mine.menu", locale).formatted(TelegramBotGame.version,from.getUserName()))
+                                    .text(Messages.load("game.mine.menu", locale).formatted(from.getUserName(),TelegramBotGame.version))
                                     .replyMarkup(InlineKeyboardMarkup.builder()
                                             .keyboard(List.of(
                                                     row
@@ -131,7 +131,7 @@ public class MineLevelCommandHandler implements CommandHandler {
                 SendMessage.builder()
                         .chatId(chat.getId())
                         .messageThreadId(message.getMessageThreadId())
-                        .text(Messages.load("game.mine.start.note", locale).formatted(TelegramBotGame.version,from.getUserName(),x,y,mine))
+                        .text(Messages.load("game.mine.start.note", locale).formatted(from.getUserName(),TelegramBotGame.version,x,y,mine))
                         .replyMarkup(InlineKeyboardMarkup.builder()
                                 .keyboard(List.of(
                                         row

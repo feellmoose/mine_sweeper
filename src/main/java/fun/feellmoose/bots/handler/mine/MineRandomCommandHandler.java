@@ -74,7 +74,7 @@ public class MineRandomCommandHandler implements CommandHandler {
                 SendMessage.builder()
                         .chatId(chat.getId())
                         .messageThreadId(message.getMessageThreadId())
-                        .text(Messages.load("game.mine.start.note", locale).formatted(TelegramBotGame.version, from.getUserName(),x,y,mine))
+                        .text(Messages.load("game.mine.start.note", locale).formatted(from.getUserName(),TelegramBotGame.version,x,y,mine))
                         .replyMarkup(InlineKeyboardMarkup.builder()
                                 .keyboard(List.of(
                                         row
