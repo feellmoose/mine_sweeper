@@ -451,7 +451,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
                 Box[][] boxes = new Box[width][height];
 
-                List<Integer> nums = IntStream.range(0, width * height)
+                List<Integer> nums = IntStream.range(0, (width - 1) * (height - 1))
                         .boxed()
                         .collect(Collectors.toList());
                 Collections.shuffle(nums);
@@ -512,7 +512,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
                 Box[][] boxes = new Box[width][height];
 
-                List<Integer> nums = IntStream.range(0, width * height)
+                List<Integer> nums = IntStream.range(0, (width - 1) * (height - 1))
                         .boxed()
                         .collect(Collectors.toList());
 
