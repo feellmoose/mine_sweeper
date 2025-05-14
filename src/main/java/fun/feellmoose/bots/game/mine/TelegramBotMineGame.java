@@ -451,13 +451,13 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
                 Box[][] boxes = new Box[width][height];
 
-                List<Integer> nums = IntStream.range(0, (width - 1) * (height - 1))
+                List<Integer> nums = IntStream.range(0, width * height)
                         .boxed()
                         .collect(Collectors.toList());
                 Collections.shuffle(nums);
                 for (int i = 0; i < serialized.mines; i++) {
                     int mine = nums.get(i);
-                    boxes[mine/width][mine%width] = Box.mine();
+                    boxes[mine/height][mine%height] = Box.mine();
                 }
 
                 for (int i = 0; i < width; i++) {
@@ -512,7 +512,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
                 Box[][] boxes = new Box[width][height];
 
-                List<Integer> nums = IntStream.range(0, (width - 1) * (height - 1))
+                List<Integer> nums = IntStream.range(0, width  * height)
                         .boxed()
                         .collect(Collectors.toList());
 
@@ -525,7 +525,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                                 new Position(x, y + 1),
                                 new Position(x, y - 1))
                         .filter(p -> p.check(width, height))
-                        .map(p -> p.x() * width + p.y())
+                        .map(p -> p.x() * height + p.y())
                         .toList();
                 List<Integer> listB = Stream.of(
                                 new Position(x + 1, y + 1),
@@ -533,7 +533,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                                 new Position(x - 1, y - 1),
                                 new Position(x - 1, y + 1))
                         .filter(p -> p.check(width, height))
-                        .map(p -> p.x() * width + p.y())
+                        .map(p -> p.x() * height + p.y())
                         .toList();
 
                 if (nums.size() - listA.size() - listB.size() >= serialized.mines) {
@@ -548,7 +548,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 Collections.shuffle(nums);
                 for (int i = 0; i < serialized.mines; i++) {
                     int mine = nums.get(i);
-                    boxes[mine/width][mine%width] = Box.mine();
+                    boxes[mine/height][mine%height] = Box.mine();
                 }
 
                 for (int i = 0; i < width; i++) {
