@@ -228,7 +228,9 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                         data.topicID(),
                         null,
                         data.userID(),
-                        TelegramBotMineGameCallbackQueryData.Action.create,
+                        additional.locale().equals(Messages.LOCALE_CN_CXG) ?
+                                TelegramBotMineGameCallbackQueryData.Action.cxg :
+                                TelegramBotMineGameCallbackQueryData.Action.create,
                         game.width(), game.height(), game.mines()
                 ).data();
                 row.add(
