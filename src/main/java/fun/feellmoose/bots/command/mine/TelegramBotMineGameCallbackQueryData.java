@@ -12,13 +12,14 @@ public record TelegramBotMineGameCallbackQueryData(
         int m
 ) {
     public enum Action {
-        create, dig, flag, quit, change, rollback, none
+        create, dig, flag, quit, change, rollback, none, cxg
     }
     /**
      * schema
      * bsg:{gameID}:{userID}:{action}:{x}:{y}:{m}
      * bsg:{topicID}:{userID}:create:{x}:{y}:{m}
      */
+    private static final String CXG_DATA_FORMAT = "v2bsg:%s:%s:cxg:%d:%d:%d";
     private static final String CREATE_DATA_FORMAT = "v2bsg:%s:%s:create:%d:%d:%d";
     private static final String ROLLBACK_DATA_FORMAT = "v2bsg:%s:%s:rollback:0:0:%d";
     private static final String COMMON_DATA_FORMAT = "v2bsg:%s:%s:%s:%d:%d:0";
@@ -28,6 +29,7 @@ public record TelegramBotMineGameCallbackQueryData(
         String userStrID = userID == null ? "" : userID.toString();
         return switch (action) {
             case create -> CREATE_DATA_FORMAT.formatted(topicStrID, userStrID, x, y, m);
+            case cxg -> CXG_DATA_FORMAT.formatted(topicStrID, userStrID, x, y, m);
             case rollback -> ROLLBACK_DATA_FORMAT.formatted(gameID,userStrID, m);
             default -> COMMON_DATA_FORMAT.formatted(gameID, userStrID, action, x, y);
         };
@@ -46,6 +48,15 @@ public record TelegramBotMineGameCallbackQueryData(
                             null,
                             userID,
                             Action.create,
+                            Integer.parseInt(args[4]),
+                            Integer.parseInt(args[5]),
+                            Integer.parseInt(args[6])
+                    );
+                    case "cxg" -> new TelegramBotMineGameCallbackQueryData(
+                            args[1].isEmpty() ? null : Integer.valueOf(args[1]),
+                            null,
+                            userID,
+                            Action.cxg,
                             Integer.parseInt(args[4]),
                             Integer.parseInt(args[5]),
                             Integer.parseInt(args[6])

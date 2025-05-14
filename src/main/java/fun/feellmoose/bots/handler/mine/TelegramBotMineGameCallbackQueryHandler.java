@@ -53,6 +53,16 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
                                 query.getMessage().getChatId(),
                                 query.getMessage().getMessageId()
                         ), data.x(),data.y(),data.m());
+                case cxg -> app.create(
+                        query.getFrom().getId(),
+                        new TelegramBotMineGameApp.Additional(
+                                TelegramBotMineGameApp.Additional.GameType.Classic_Bottom,
+                                TelegramBotMineGameApp.Additional.Button.Click,
+                                Messages.LOCALE_CN_CXG,
+                                data.topicID(),
+                                query.getMessage().getChatId(),
+                                query.getMessage().getMessageId()
+                        ), data.x(),data.y(),data.m());
                 case quit -> {
                     app.quit(data.gameID());
                     yield null;
