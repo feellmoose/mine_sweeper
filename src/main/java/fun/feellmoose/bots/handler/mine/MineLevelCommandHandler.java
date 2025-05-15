@@ -34,9 +34,9 @@ public class MineLevelCommandHandler implements CommandHandler {
             case 2 -> {
                 try {
                     switch (args[1].toLowerCase()) {
-                        case "easy" -> MineGameStartMenu.view(6, 6, 5, message, locale).display(client, message);
-                        case "normal" -> MineGameStartMenu.view(8, 8, 10, message, locale).display(client, message);
-                        case "hard" -> MineGameStartMenu.view(8, 8, 13, message, locale).display(client, message);
+                        case "easy" -> MineGameStartMenu.easy(message, locale).display(client, message);
+                        case "normal" -> MineGameStartMenu.normal(message, locale).display(client, message);
+                        case "hard" -> MineGameStartMenu.hard(message, locale).display(client, message);
                         default -> client.execute(
                                 SendMessage.builder()
                                         .text("@%s [level]: 'easy', 'normal', or 'hard'".formatted(from.getUserName()))

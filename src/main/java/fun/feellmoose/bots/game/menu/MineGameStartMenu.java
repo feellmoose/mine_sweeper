@@ -30,6 +30,9 @@ public record MineGameStartMenu(
     public static final String CLASSIC_MENU_NAME = "game-mine-start-classic";
     public static final String RANDOM_MENU_NAME = "game-mine-start-random";
     public static final String LEVEL_MENU_NAME = "game-mine-start-level";
+    public static final String LEVEL_EASY_MENU_NAME = "game-mine-start-level-easy";
+    public static final String LEVEL_NORMAL_MENU_NAME = "game-mine-start-level-normal";
+    public static final String LEVEL_HARD_MENU_NAME = "game-mine-start-level-hard";
 
     @Nullable
     public static MineGameStartMenu of(TelegramBotMenuCallbackQueryCommand command, Locale locale){
@@ -37,6 +40,9 @@ public record MineGameStartMenu(
             case MineGameStartMenu.CLASSIC_MENU_NAME -> classic(command, locale);
             case MineGameStartMenu.RANDOM_MENU_NAME -> random(command, locale);
             case MineGameStartMenu.LEVEL_MENU_NAME -> level(command, locale);
+            case MineGameStartMenu.LEVEL_EASY_MENU_NAME -> easy(command, locale);
+            case MineGameStartMenu.LEVEL_NORMAL_MENU_NAME -> normal(command, locale);
+            case MineGameStartMenu.LEVEL_HARD_MENU_NAME -> hard(command, locale);
             case GUIDE_MENU_NAME -> guide(command, locale);
             default -> null;
         };
@@ -133,6 +139,31 @@ public record MineGameStartMenu(
         );
     }
 
+    public static MineGameStartMenu easy(TelegramBotMenuCallbackQueryCommand command, Locale locale) {
+        return view(6,6,5,command,locale);
+    }
+
+    public static MineGameStartMenu easy(Message message, Locale locale) {
+        return view(6,6,5,message,locale);
+    }
+
+    public static MineGameStartMenu normal(TelegramBotMenuCallbackQueryCommand command, Locale locale) {
+        return view(8,8,10,command,locale);
+    }
+
+    public static MineGameStartMenu normal(Message message, Locale locale) {
+        return view(8,8,10,message,locale);
+    }
+
+    public static MineGameStartMenu hard(TelegramBotMenuCallbackQueryCommand command, Locale locale) {
+        return view(8,8,13,command,locale);
+    }
+
+    public static MineGameStartMenu hard(Message message, Locale locale) {
+        return view(8,8,13,message,locale);
+    }
+
+
     public static MineGameStartMenu classic(TelegramBotMenuCallbackQueryCommand command, Locale locale) {
         return view(8,8,10,command,locale);
     }
@@ -194,33 +225,30 @@ public record MineGameStartMenu(
         var data = command.data();
         return new MineGameStartMenu(
                 LEVEL_MENU_NAME,
-                Messages.load("game.mine.start.level.note", locale).formatted(query.getFrom().getUserName()),
+                Messages.load("game.mine.start.level.note", locale).formatted(query.getFrom().getUserName(),TelegramBotGame.version),
                 locale,
                 List.of(
                         List.of(
-                                Button.of("game.mine.start.level.easy",
-                                        new TelegramBotMineGameCallbackQueryData(
+                                Button.of("game.mine.menu.random.button",
+                                        new TelegramBotMenuCallbackQueryData(
+                                                TelegramBotMenuCallbackQueryData.Action.jump,
                                                 data.topicID(),
-                                                null,
                                                 data.userID(),
-                                                TelegramBotMineGameCallbackQueryData.Action.create,
-                                                6,6,5
+                                                LEVEL_EASY_MENU_NAME
                                         )),
                                 Button.of("game.mine.start.level.normal",
-                                        new TelegramBotMineGameCallbackQueryData(
+                                        new TelegramBotMenuCallbackQueryData(
+                                                TelegramBotMenuCallbackQueryData.Action.jump,
                                                 data.topicID(),
-                                                null,
                                                 data.userID(),
-                                                TelegramBotMineGameCallbackQueryData.Action.create,
-                                                8,8,10
+                                                LEVEL_NORMAL_MENU_NAME
                                         )),
                                 Button.of("game.mine.start.level.hard",
-                                        new TelegramBotMineGameCallbackQueryData(
+                                        new TelegramBotMenuCallbackQueryData(
+                                                TelegramBotMenuCallbackQueryData.Action.jump,
                                                 data.topicID(),
-                                                null,
                                                 data.userID(),
-                                                TelegramBotMineGameCallbackQueryData.Action.create,
-                                                8,8,13
+                                                LEVEL_HARD_MENU_NAME
                                         ))
                         )
                 )
@@ -232,33 +260,30 @@ public record MineGameStartMenu(
         Long userID = message.getFrom().getId();
         return new MineGameStartMenu(
                 LEVEL_MENU_NAME,
-                Messages.load("game.mine.start.level.note", locale).formatted(message.getFrom().getUserName()),
+                Messages.load("game.mine.start.level.note", locale).formatted(message.getFrom().getUserName(),TelegramBotGame.version),
                 locale,
                 List.of(
                         List.of(
-                                Button.of("game.mine.start.level.easy",
-                                        new TelegramBotMineGameCallbackQueryData(
+                                Button.of("game.mine.menu.random.button",
+                                        new TelegramBotMenuCallbackQueryData(
+                                                TelegramBotMenuCallbackQueryData.Action.jump,
                                                 topicID,
-                                                null,
                                                 userID,
-                                                TelegramBotMineGameCallbackQueryData.Action.create,
-                                                6,6,5
+                                                LEVEL_EASY_MENU_NAME
                                         )),
                                 Button.of("game.mine.start.level.normal",
-                                        new TelegramBotMineGameCallbackQueryData(
+                                        new TelegramBotMenuCallbackQueryData(
+                                                TelegramBotMenuCallbackQueryData.Action.jump,
                                                 topicID,
-                                                null,
                                                 userID,
-                                                TelegramBotMineGameCallbackQueryData.Action.create,
-                                                8,8,10
+                                                LEVEL_NORMAL_MENU_NAME
                                         )),
                                 Button.of("game.mine.start.level.hard",
-                                        new TelegramBotMineGameCallbackQueryData(
+                                        new TelegramBotMenuCallbackQueryData(
+                                                TelegramBotMenuCallbackQueryData.Action.jump,
                                                 topicID,
-                                                null,
                                                 userID,
-                                                TelegramBotMineGameCallbackQueryData.Action.create,
-                                                8,8,13
+                                                LEVEL_HARD_MENU_NAME
                                         ))
                         )
                 )

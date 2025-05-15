@@ -50,7 +50,6 @@ public interface Menu {
     default void display(TelegramClient client, TelegramBotMenuCallbackQueryCommand command) throws TelegramApiException {
         var query = command.callbackQuery();
         var data = command.data();
-        log.debug("Show menu command: {}", command);
         switch (data.action()) {
             case jump -> {
                 var rows = this.rows().stream()
