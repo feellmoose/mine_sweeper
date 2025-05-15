@@ -1,6 +1,10 @@
 package fun.feellmoose.bots.game.menu;
 
 import fun.feellmoose.bots.command.menu.TelegramBotMenuCallbackQueryCommand;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -14,6 +18,8 @@ import java.util.List;
 import java.util.Locale;
 
 public interface Menu {
+    Logger log = LoggerFactory.getLogger(Menu.class);
+
     String id();
 
     String message();
@@ -44,6 +50,7 @@ public interface Menu {
     default void display(TelegramClient client, TelegramBotMenuCallbackQueryCommand command) throws TelegramApiException {
         var query = command.callbackQuery();
         var data = command.data();
+        log.debug("Show menu command: {}", command);
         switch (data.action()) {
             case jump -> {
                 var rows = this.rows().stream()
