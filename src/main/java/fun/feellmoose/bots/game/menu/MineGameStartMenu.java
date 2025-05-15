@@ -229,7 +229,7 @@ public record MineGameStartMenu(
                 locale,
                 List.of(
                         List.of(
-                                Button.of("game.mine.menu.random.button",
+                                Button.of("game.mine.start.level.easy",
                                         new TelegramBotMenuCallbackQueryData(
                                                 TelegramBotMenuCallbackQueryData.Action.jump,
                                                 data.topicID(),
@@ -264,7 +264,7 @@ public record MineGameStartMenu(
                 locale,
                 List.of(
                         List.of(
-                                Button.of("game.mine.menu.random.button",
+                                Button.of("game.mine.start.level.easy",
                                         new TelegramBotMenuCallbackQueryData(
                                                 TelegramBotMenuCallbackQueryData.Action.jump,
                                                 topicID,
