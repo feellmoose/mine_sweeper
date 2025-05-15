@@ -2,6 +2,8 @@ package fun.feellmoose.bots.handler.mine;
 
 import fun.feellmoose.bots.TelegramBotGame;
 import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
+import fun.feellmoose.bots.game.menu.Menu;
+import fun.feellmoose.bots.game.menu.MineGameStartMenu;
 import fun.feellmoose.bots.handler.CommandHandler;
 import fun.feellmoose.i18n.Messages;
 import fun.feellmoose.utils.LocaleUtils;
@@ -35,40 +37,10 @@ public class MineCommandHandler implements CommandHandler {
 
     @Override
     public void handle(Message message, Chat chat, User from, String[] args) {
-        User user = message.getFrom();
-        Long userID = user.getId();
-        String username = user.getUserName();
-        String chatID = message.getChatId().toString();
-        Integer threadID = message.getMessageThreadId();
         Locale locale = LocaleUtils.fromString(from.getLanguageCode());
         if (args.length == 1) {
-            //send create guide for user
-            var row = new InlineKeyboardRow();
-            row.add(
-                    InlineKeyboardButton.builder()
-                            .text(Messages.load("game.mine.start.button", locale).formatted())
-                            .callbackData(
-                                    new TelegramBotMineGameCallbackQueryData(
-                                            threadID,
-                                            null,
-                                            userID,
-                                            TelegramBotMineGameCallbackQueryData.Action.create,
-                                            8,8,10
-                                    ).data()
-                            ).build()
-            );
             try {
-                client.executeAsync(
-                        SendMessage.builder()
-                                .chatId(chatID)
-                                .messageThreadId(threadID)
-                                .text(Messages.load("game.mine.menu", locale).formatted(username,TelegramBotGame.version))
-                                .replyMarkup(InlineKeyboardMarkup.builder()
-                                        .keyboard(List.of(
-                                                row
-                                        )).build())
-                                .build()
-                );
+                MineGameStartMenu.guide(message,locale).display(client,message);
             } catch (TelegramApiException e) {
                 log.error("Error while sending message to Mine Sweeper Bot", e);
             }
@@ -76,31 +48,8 @@ public class MineCommandHandler implements CommandHandler {
             int x = Integer.parseInt(args[1]);
             int y = Integer.parseInt(args[2]);
             int m = Integer.parseInt(args[3]);
-            var row = new InlineKeyboardRow();
-            row.add(
-                    InlineKeyboardButton.builder()
-                            .text(Messages.load("game.mine.start.button", locale).formatted())
-                            .callbackData(new TelegramBotMineGameCallbackQueryData(
-                                    threadID,
-                                    null,
-                                    userID,
-                                    TelegramBotMineGameCallbackQueryData.Action.create,
-                                    x,y,m
-                            ).data())
-                            .build()
-            );
             try {
-                client.executeAsync(
-                        SendMessage.builder()
-                                .chatId(chatID)
-                                .messageThreadId(threadID)
-                                .text(Messages.load("game.mine.start.note", locale).formatted(username,TelegramBotGame.version,x,y,m))
-                                .replyMarkup(InlineKeyboardMarkup.builder()
-                                        .keyboard(List.of(
-                                                row
-                                        )).build())
-                                .build()
-                );
+                MineGameStartMenu.view(x,y,m,message,locale).display(client,message);
             } catch (TelegramApiException e) {
                 log.error("Error while sending message to Mine Sweeper Bot", e);
             }

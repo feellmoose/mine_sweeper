@@ -2,6 +2,7 @@ package fun.feellmoose.bots.handler.mine;
 
 import fun.feellmoose.bots.TelegramBotGame;
 import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
+import fun.feellmoose.bots.game.menu.MineGameStartMenu;
 import fun.feellmoose.bots.handler.CommandHandler;
 import fun.feellmoose.i18n.Messages;
 import fun.feellmoose.utils.LocaleUtils;
@@ -38,48 +39,11 @@ public class MineRandomCommandHandler implements CommandHandler {
 
     @Override
     public void handle(Message message, Chat chat, User from, String[] args) {
-        int width = ThreadLocalRandom.current().nextInt(3, 8);
-        int height = ThreadLocalRandom.current().nextInt(3, 8);
-        int total = width * height;
-        Function<Double,Double> refactor = (raw) -> {
-            if (raw > 0.7) return Math.pow(raw, 3.0);
-            if (raw < 0.2) return Math.pow(raw, 0.5);
-            return raw;
-        };
-        double density = RandomUtils.randomDensity(0.10, 0.25, refactor);
-        int mines = (int) (density * total);
+        Locale locale = LocaleUtils.fromString(message.getFrom().getLanguageCode());
         try {
-            startClassic(message,chat,from,width,height,mines);
+            MineGameStartMenu.random(message,locale).display(client,message);
         } catch (TelegramApiException e) {
             log.error("Error while sending message to Mine Sweeper Bot", e);
         }
-    }
-
-    private void startClassic(Message message, Chat chat, User from, int x, int y, int mine) throws TelegramApiException {
-        var row = new InlineKeyboardRow();
-        Locale locale = LocaleUtils.fromString(from.getLanguageCode());
-        row.add(
-                InlineKeyboardButton.builder()
-                        .text(Messages.load("game.mine.start.button", locale).formatted())
-                        .callbackData(new TelegramBotMineGameCallbackQueryData(
-                                message.getMessageThreadId(),
-                                null,
-                                from.getId(),
-                                TelegramBotMineGameCallbackQueryData.Action.create,
-                                x,y,mine
-                        ).data())
-                        .build()
-        );
-        client.executeAsync(
-                SendMessage.builder()
-                        .chatId(chat.getId())
-                        .messageThreadId(message.getMessageThreadId())
-                        .text(Messages.load("game.mine.start.note", locale).formatted(from.getUserName(),TelegramBotGame.version,x,y,mine))
-                        .replyMarkup(InlineKeyboardMarkup.builder()
-                                .keyboard(List.of(
-                                        row
-                                )).build())
-                        .build()
-        );
     }
 }

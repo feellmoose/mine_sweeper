@@ -1,5 +1,6 @@
 package fun.feellmoose.bots.command.mine;
 
+import fun.feellmoose.bots.command.CallbackQueryData;
 import org.jetbrains.annotations.Nullable;
 
 public record TelegramBotMineGameCallbackQueryData(
@@ -10,7 +11,7 @@ public record TelegramBotMineGameCallbackQueryData(
         int x,
         int y,
         int m
-) {
+) implements CallbackQueryData {
     public enum Action {
         create, dig, flag, quit, change, rollback, none, cxg
     }
@@ -24,6 +25,7 @@ public record TelegramBotMineGameCallbackQueryData(
     private static final String ROLLBACK_DATA_FORMAT = "v2bsg:%s:%s:rollback:0:0:%d";
     private static final String COMMON_DATA_FORMAT = "v2bsg:%s:%s:%s:%d:%d:0";
 
+    @Override
     public String data() {
         String topicStrID = topicID == null ? "" : topicID.toString();
         String userStrID = userID == null ? "" : userID.toString();

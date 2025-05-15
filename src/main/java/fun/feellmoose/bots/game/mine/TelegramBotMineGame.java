@@ -1,11 +1,21 @@
 package fun.feellmoose.bots.game.mine;
 
+import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryCommand;
+import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
 import fun.feellmoose.bots.game.GenID;
 import fun.feellmoose.game.mine.core.GameException;
+import fun.feellmoose.i18n.Messages;
 import fun.feellmoose.repo.Repo;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -68,7 +78,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
         return data.win();
     }
 
-    public TelegramBotMineGame onAdditionalChanged(Map<String,String> additional) {
+    public TelegramBotMineGame onAdditionalChanged(Map<String, String> additional) {
         return new TelegramBotMineGame(
                 new SerializedTelegramBotGame(
                         data.id, data.userID, additional, data.steps, data.mines, data.width, data.height, data.boxes, data.history, data.win, data.status, data.create, LocalDateTime.now(), data.start, data.end
@@ -111,7 +121,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
             System.arraycopy(history, 0, current, 0, history.length);
             LocalDateTime now = LocalDateTime.now();
             if (box.isMine()) {
-                current[history.length] = new History(position, GameOption.Boom, now,null);
+                current[history.length] = new History(position, GameOption.Boom, now, null);
                 return new TelegramBotMineGame(
                         new SerializedTelegramBotGame(
                                 id, userID, infos, steps + clicked, mines, width, height, nBoxes, current, false, GameStatus.End, create, now, Optional.ofNullable(start).orElse(now), now
@@ -119,16 +129,16 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 );
             } else {
                 if (box.num() == 0) {
-                    History[] related  = clickedZero(width,height,position,boxes);
+                    History[] related = clickedZero(width, height, position, boxes);
                     clicked += related.length;
-                    current[history.length] = new History(position, GameOption.Click, now,related);
+                    current[history.length] = new History(position, GameOption.Click, now, related);
                     for (History h : related) {
                         int x = h.position().x();
                         int y = h.position().y();
                         nBoxes[x][y] = boxes[x][y].clicked();
                     }
                 } else {
-                    current[history.length] = new History(position, GameOption.Click, now,null);
+                    current[history.length] = new History(position, GameOption.Click, now, null);
                 }
 
                 if (steps + mines + clicked == width * height) {
@@ -156,14 +166,14 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
         int x = from.x();
         int y = from.y();
         List<Position> require = Stream.of(
-                new Position(x - 1, y - 1),
-                new Position(x + 1, y - 1),
-                new Position(x - 1, y + 1),
-                new Position(x + 1, y + 1),
-                new Position(x - 1, y),
-                new Position(x, y - 1),
-                new Position(x + 1, y),
-                new Position(x, y + 1)
+                        new Position(x - 1, y - 1),
+                        new Position(x + 1, y - 1),
+                        new Position(x - 1, y + 1),
+                        new Position(x + 1, y + 1),
+                        new Position(x - 1, y),
+                        new Position(x, y - 1),
+                        new Position(x + 1, y),
+                        new Position(x, y + 1)
                 ).filter(position -> position.check(width, height))
                 .toList();
         while (!require.isEmpty()) {
@@ -172,7 +182,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 if (visited.contains(p)) continue;
                 Box box = boxes[p.x()][p.y()];
                 if (box.isClicked() || box.isFlagged() || box.isMine()) continue;
-                history.add(new History(p, GameOption.Click, null,null));
+                history.add(new History(p, GameOption.Click, null, null));
                 visited.add(p);
                 if (box.num() == 0) {
                     int px = p.x();
@@ -222,7 +232,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
             History[] current = new History[history.length + 1];
             System.arraycopy(history, 0, current, 0, history.length);
-            current[history.length] = new History(position, GameOption.Flag, LocalDateTime.now(),null);
+            current[history.length] = new History(position, GameOption.Flag, LocalDateTime.now(), null);
 
             LocalDateTime now = LocalDateTime.now();
 
@@ -265,7 +275,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                         @Nullable LocalDateTime start,
                         @Nullable LocalDateTime end
                 )) {
-                    if (status == BotMineGame.GameStatus.UnInit) yield  this;
+                    if (status == BotMineGame.GameStatus.UnInit) yield this;
                     Position position = history.position();
                     Box box = boxes[position.x()][position.y()];
                     if (win || box.isClicked() || status == GameStatus.End) yield this;
@@ -281,7 +291,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                     for (int i = 0; i < width; i++) {
                         System.arraycopy(boxes[i], 0, nBoxes[i], 0, height);
                     }
-                    yield  new TelegramBotMineGame(
+                    yield new TelegramBotMineGame(
                             new SerializedTelegramBotGame(
                                     id, userID, infos, steps + 1, mines, width, height, nBoxes, current, false, GameStatus.End, create, now, Optional.ofNullable(start).orElse(now), now
                             )
@@ -316,7 +326,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
             History[] current;
             if (history.length > s) {
                 current = new History[history.length - s];
-                System.arraycopy(history,0, current,0,history.length - s);
+                System.arraycopy(history, 0, current, 0, history.length - s);
                 nUpdate = history[history.length - s - 1].update();
 
             } else {
@@ -337,7 +347,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                         Box box = nBoxes[position.x()][position.y()];
                         nBoxes[position.x()][position.y()] = box.flagged();
                     }
-                    case Click-> {
+                    case Click -> {
                         Box box = nBoxes[position.x()][position.y()];
                         nBoxes[position.x()][position.y()] = Box.num(box.num());
                         if (rollback.related() != null) {
@@ -354,7 +364,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
             return new TelegramBotMineGame(
                     new SerializedTelegramBotGame(
-                            id, userID, infos, steps, mines, width, height, nBoxes, current, false, GameStatus.Running, create, nUpdate , start, null
+                            id, userID, infos, steps, mines, width, height, nBoxes, current, false, GameStatus.Running, create, nUpdate, start, null
                     )
             );
         }
@@ -414,11 +424,11 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
         private final GenID genID;
 
 
-        public TelegramBotMineGame create(int width, int height, int mines, Long userID, Map<String,String> info) throws GameException {
-            return start(empty(width,height,mines,userID,info));
+        public TelegramBotMineGame create(int width, int height, int mines, Long userID, Map<String, String> info) throws GameException {
+            return start(empty(width, height, mines, userID, info));
         }
 
-        public TelegramBotMineGame empty(int width, int height, int mines, Long userID, Map<String,String> info) throws GameException {
+        public TelegramBotMineGame empty(int width, int height, int mines, Long userID, Map<String, String> info) throws GameException {
             if (width * height <= mines) throw new GameException("width * height <= mines");
             if (width <= 0 || height <= 0) throw new GameException("width <= 0 || height <= 0");
             if (mines < 0) throw new GameException("mines < 0");
@@ -457,25 +467,25 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 Collections.shuffle(nums);
                 for (int i = 0; i < serialized.mines; i++) {
                     int mine = nums.get(i);
-                    boxes[mine/height][mine%height] = Box.mine();
+                    boxes[mine / height][mine % height] = Box.mine();
                 }
 
                 for (int i = 0; i < width; i++) {
                     for (int j = 0; j < height; j++) {
                         if (boxes[i][j] != null && boxes[i][j].isMine()) continue;
                         int num = (int) Stream.of(
-                                new Position(i + 1, j + 1),
-                                new Position(i + 1, j - 1),
-                                new Position(i - 1, j - 1),
-                                new Position(i - 1, j + 1),
-                                new Position(i + 1, j),
-                                new Position(i - 1, j),
-                                new Position(i, j + 1),
-                                new Position(i, j - 1))
+                                        new Position(i + 1, j + 1),
+                                        new Position(i + 1, j - 1),
+                                        new Position(i - 1, j - 1),
+                                        new Position(i - 1, j + 1),
+                                        new Position(i + 1, j),
+                                        new Position(i - 1, j),
+                                        new Position(i, j + 1),
+                                        new Position(i, j - 1))
                                 .filter(p -> p.check(width, height))
                                 .filter(p -> {
                                     Box box = boxes[p.x()][p.y()];
-                                    return  box != null && box.isMine();
+                                    return box != null && box.isMine();
                                 }).count();
                         boxes[i][j] = Box.num(num);
                     }
@@ -512,7 +522,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
 
                 Box[][] boxes = new Box[width][height];
 
-                List<Integer> nums = IntStream.range(0, width  * height)
+                List<Integer> nums = IntStream.range(0, width * height)
                         .boxed()
                         .collect(Collectors.toList());
 
@@ -548,7 +558,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 Collections.shuffle(nums);
                 for (int i = 0; i < serialized.mines; i++) {
                     int mine = nums.get(i);
-                    boxes[mine/height][mine%height] = Box.mine();
+                    boxes[mine / height][mine % height] = Box.mine();
                 }
 
                 for (int i = 0; i < width; i++) {
@@ -563,7 +573,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                                         new Position(i - 1, j),
                                         new Position(i, j + 1),
                                         new Position(i, j - 1))
-                                .filter(p -> p.check(width, height) )
+                                .filter(p -> p.check(width, height))
                                 .filter(p -> {
                                     Box box = boxes[p.x()][p.y()];
                                     return box != null && box.isMine();
@@ -591,6 +601,267 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                 )).onClicked(position);
             }
             return empty;
+        }
+    }
+
+    public void display(TelegramClient client, TelegramBotMineGameCallbackQueryCommand command) throws TelegramApiException {
+        var info = this.serialize();
+        var query = command.callbackQuery();
+        var data = command.data();
+        var additional = TelegramBotMineGameApp.Additional.fromMap(info.infos());
+        var message = query.getMessage();
+
+        if (this.win()) {
+            client.executeAsync(
+                    EditMessageText.builder()
+                            .chatId(message.getChatId())
+                            .messageId(message.getMessageId())
+                            .text(Messages.load("game.mine.win.note", additional.locale()).formatted(
+                                    query.getFrom().getUserName(),
+                                    this.duration().toSeconds(),
+                                    this.duration().toMillisPart(),
+                                    this.width(),
+                                    this.height(),
+                                    this.mines()
+                            )).build()
+            );
+            client.executeAsync(
+                    EditMessageReplyMarkup.builder()
+                            .chatId(message.getChatId())
+                            .messageId(message.getMessageId())
+                            .replyMarkup(
+                                    InlineKeyboardMarkup.builder()
+                                            .keyboard(List.of())
+                                            .build()
+                            ).build()
+            );
+        } else if (this.status() == BotMineGame.GameStatus.End) {
+            client.execute(
+                    EditMessageText.builder()
+                            .chatId(message.getChatId())
+                            .messageId(message.getMessageId())
+                            .text(Messages.load("game.mine.lose.note", additional.locale()).formatted(
+                                    query.getFrom().getUserName(),
+                                    this.duration().toSeconds(),
+                                    this.duration().toMillisPart(),
+                                    this.width(),
+                                    this.height(),
+                                    this.mines()
+                            )).build()
+            );
+            List<InlineKeyboardRow> keyboard = new ArrayList<>();
+            BotMineGame.Box[][] boxes = this.boxes();
+            for (int i = 0; i < this.width(); i++) {
+                InlineKeyboardRow row = new InlineKeyboardRow();
+                for (int j = 0; j < this.height(); j++) {
+                    BotMineGame.Box box = boxes[i][j];
+                    String callback = new TelegramBotMineGameCallbackQueryData(
+                            data.topicID(),
+                            this.id(),
+                            data.userID(),
+                            TelegramBotMineGameCallbackQueryData.Action.none,
+                            i, j, 0
+                    ).data();
+                    if (box.isMine() && box.isClicked()) {
+                        row.add(InlineKeyboardButton.builder()
+                                .text("\uD83D\uDCA5")
+                                .callbackData(callback)
+                                .build());
+                    } else if (box.isMine()) {
+                        row.add(InlineKeyboardButton.builder()
+                                .text("\uD83D\uDCA3")
+                                .callbackData(callback)
+                                .build());
+                    } else if (box.isFlagged()) {
+                        row.add(InlineKeyboardButton.builder()
+                                .text("\uD83D\uDEA9")
+                                .callbackData(callback)
+                                .build());
+                    } else if (box.isClicked()) {
+                        row.add(InlineKeyboardButton.builder()
+                                .text(String.valueOf(box.num()))
+                                .callbackData(callback)
+                                .build());
+                    } else {
+                        row.add(InlineKeyboardButton.builder()
+                                .text("ㅤ")
+                                .callbackData(callback)
+                                .build());
+                    }
+                }
+                keyboard.add(row);
+            }
+            InlineKeyboardRow row = new InlineKeyboardRow();
+            String retry = new TelegramBotMineGameCallbackQueryData(
+                    data.topicID(),
+                    null,
+                    data.userID(),
+                    additional.locale().equals(Messages.LOCALE_CN_CXG) ?
+                            TelegramBotMineGameCallbackQueryData.Action.cxg :
+                            TelegramBotMineGameCallbackQueryData.Action.create,
+                    this.width(), this.height(), this.mines()
+            ).data();
+            row.add(
+                    InlineKeyboardButton.builder()
+                            .text(Messages.load("game.mine.lose.button", additional.locale()).formatted())
+                            .callbackData(retry)
+                            .build()
+            );
+            keyboard.add(row);
+            client.execute(
+                    EditMessageReplyMarkup.builder()
+                            .chatId(message.getChatId())
+                            .messageId(message.getMessageId())
+                            .replyMarkup(
+                                    InlineKeyboardMarkup.builder()
+                                            .keyboard(keyboard)
+                                            .build()
+                            ).build()
+            );
+        } else if (this.status() == BotMineGame.GameStatus.UnInit) {
+            List<InlineKeyboardRow> keyboard = new ArrayList<>();
+            TelegramBotMineGameCallbackQueryData.Action action = switch (additional.button()) {
+                case Click -> TelegramBotMineGameCallbackQueryData.Action.dig;
+                case Flag -> TelegramBotMineGameCallbackQueryData.Action.flag;
+            };
+            for (int i = 0; i < this.width(); i++) {
+                InlineKeyboardRow row = new InlineKeyboardRow();
+                for (int j = 0; j < this.height(); j++) {
+                    String callback = new TelegramBotMineGameCallbackQueryData(
+                            data.topicID(),
+                            this.id(),
+                            data.userID(),
+                            action,
+                            i, j, 0
+                    ).data();
+                    row.add(InlineKeyboardButton.builder()
+                            .text("ㅤ")
+                            .callbackData(callback)
+                            .build());
+                }
+                keyboard.add(row);
+            }
+            InlineKeyboardRow row = new InlineKeyboardRow();
+            Messages.MessageString next = switch (additional.button()) {
+                case Click -> Messages.load("game.mine.opt.flag", additional.locale());
+                case Flag -> Messages.load("game.mine.opt.click", additional.locale());
+            };
+            String change = new TelegramBotMineGameCallbackQueryData(
+                    data.topicID(),
+                    this.id(),
+                    data.userID(),
+                    TelegramBotMineGameCallbackQueryData.Action.change,
+                    0, 0, 0
+            ).data();
+            String quit = new TelegramBotMineGameCallbackQueryData(
+                    data.topicID(),
+                    this.id(),
+                    data.userID(),
+                    TelegramBotMineGameCallbackQueryData.Action.quit,
+                    0, 0, 0
+            ).data();
+            row.add(
+                    InlineKeyboardButton.builder()
+                            .text(next.formatted())
+                            .callbackData(change)
+                            .build()
+            );
+            row.add(
+                    InlineKeyboardButton.builder()
+                            .text(Messages.load("game.mine.opt.quit", additional.locale()).formatted())
+                            .callbackData(quit)
+                            .build()
+            );
+            keyboard.add(row);
+            client.execute(
+                    EditMessageReplyMarkup.builder()
+                            .chatId(message.getChatId())
+                            .messageId(message.getMessageId())
+                            .replyMarkup(
+                                    InlineKeyboardMarkup.builder()
+                                            .keyboard(keyboard)
+                                            .build()
+                            ).build()
+            );
+        } else {
+            List<InlineKeyboardRow> keyboard = new ArrayList<>();
+            BotMineGame.Box[][] boxes = this.boxes();
+            TelegramBotMineGameCallbackQueryData.Action action = switch (additional.button()) {
+                case Click -> TelegramBotMineGameCallbackQueryData.Action.dig;
+                case Flag -> TelegramBotMineGameCallbackQueryData.Action.flag;
+            };
+            for (int i = 0; i < this.width(); i++) {
+                InlineKeyboardRow row = new InlineKeyboardRow();
+                for (int j = 0; j < this.height(); j++) {
+                    BotMineGame.Box box = boxes[i][j];
+                    String callback = new TelegramBotMineGameCallbackQueryData(
+                            data.topicID(),
+                            this.id(),
+                            data.userID(),
+                            action,
+                            i, j, 0
+                    ).data();
+                    if (box.isFlagged()) {
+                        row.add(InlineKeyboardButton.builder()
+                                .text("\uD83D\uDEA9")
+                                .callbackData(callback)
+                                .build());
+                    } else if (box.isClicked()) {
+                        row.add(InlineKeyboardButton.builder()
+                                .text(String.valueOf(box.num()))
+                                .callbackData(callback)
+                                .build());
+                    } else {
+                        row.add(InlineKeyboardButton.builder()
+                                .text("ㅤ")
+                                .callbackData(callback)
+                                .build());
+                    }
+                }
+                keyboard.add(row);
+            }
+            InlineKeyboardRow row = new InlineKeyboardRow();
+            Messages.MessageString next = switch (additional.button()) {
+                case Click -> Messages.load("game.mine.opt.flag", additional.locale());
+                case Flag -> Messages.load("game.mine.opt.click", additional.locale());
+            };
+            String change = new TelegramBotMineGameCallbackQueryData(
+                    data.topicID(),
+                    this.id(),
+                    data.userID(),
+                    TelegramBotMineGameCallbackQueryData.Action.change,
+                    0, 0, 0
+            ).data();
+            String quit = new TelegramBotMineGameCallbackQueryData(
+                    data.topicID(),
+                    this.id(),
+                    data.userID(),
+                    TelegramBotMineGameCallbackQueryData.Action.quit,
+                    0, 0, 0
+            ).data();
+            row.add(
+                    InlineKeyboardButton.builder()
+                            .text(next.formatted())
+                            .callbackData(change)
+                            .build()
+            );
+            row.add(
+                    InlineKeyboardButton.builder()
+                            .text(Messages.load("game.mine.opt.quit", additional.locale()).formatted())
+                            .callbackData(quit)
+                            .build()
+            );
+            keyboard.add(row);
+            client.execute(
+                    EditMessageReplyMarkup.builder()
+                            .chatId(message.getChatId())
+                            .messageId(message.getMessageId())
+                            .replyMarkup(
+                                    InlineKeyboardMarkup.builder()
+                                            .keyboard(keyboard)
+                                            .build()
+                            ).build()
+            );
         }
     }
 

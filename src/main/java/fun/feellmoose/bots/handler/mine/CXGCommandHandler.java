@@ -62,7 +62,7 @@ public class CXGCommandHandler implements CommandHandler {
                         SendMessage.builder()
                                 .chatId(chatID)
                                 .messageThreadId(threadID)
-                                .text(Messages.load("game.mine.menu", locale).formatted(username,TelegramBotGame.version))
+                                .text(Messages.load("game.mine.menu.guide.note", locale).formatted(username,TelegramBotGame.version))
                                 .replyMarkup(InlineKeyboardMarkup.builder()
                                         .keyboard(List.of(
                                                 row
