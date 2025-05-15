@@ -29,7 +29,7 @@ public class Main {
                 .botToken(botToken)
                 .client(client)
                 .registerCallbackQueryHandler(new TelegramBotMineGameCallbackQueryHandler(app, client))
-                .removeCallbackQueryHandler(new TelegramBotMenuCallbackQueryHandler(client))
+                .registerCallbackQueryHandler(new TelegramBotMenuCallbackQueryHandler(client))
                 .registerCommandHandler(new MineCommandHandler(client))
                 .registerCommandHandler(new MineLevelCommandHandler(client))
                 .registerCommandHandler(new MineRandomCommandHandler(client))
