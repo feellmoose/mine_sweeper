@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 public record MineGameStartMenu(
         String id,
         String message,
+        Type type,
         Locale locale,
         List<List<Button>> rows
 ) implements Menu {
@@ -57,6 +58,7 @@ public record MineGameStartMenu(
                         query.getFrom().getUserName(),
                         TelegramBotGame.version
                 ),
+                Type.TEXT,
                 locale,
                 List.of(List.of(Button.of("game.mine.menu.classic.button",
                                 new TelegramBotMenuCallbackQueryData(
@@ -92,6 +94,7 @@ public record MineGameStartMenu(
                         message.getFrom().getUserName(),
                         TelegramBotGame.version
                 ),
+                Type.TEXT,
                 locale,
                 List.of(List.of(Button.of("game.mine.menu.classic.button",
                                 new TelegramBotMenuCallbackQueryData(
@@ -123,6 +126,7 @@ public record MineGameStartMenu(
         return new MineGameStartMenu(
                 CLASSIC_MENU_NAME,
                 Messages.load("game.mine.start.note", locale).formatted(query.getFrom().getUserName(), TelegramBotGame.version,width,height,mine),
+                Type.TEXT,
                 locale,
                 List.of(
                         List.of(
@@ -204,6 +208,7 @@ public record MineGameStartMenu(
         return new MineGameStartMenu(
                 CLASSIC_MENU_NAME,
                 Messages.load("game.mine.start.note", locale).formatted(message.getFrom().getUserName(), TelegramBotGame.version,width,height,mine),
+                Type.TEXT,
                 locale,
                 List.of(
                         List.of(
@@ -226,6 +231,7 @@ public record MineGameStartMenu(
         return new MineGameStartMenu(
                 LEVEL_MENU_NAME,
                 Messages.load("game.mine.start.level.note", locale).formatted(query.getFrom().getUserName(),TelegramBotGame.version),
+                Type.HTML,
                 locale,
                 List.of(
                         List.of(
@@ -261,6 +267,7 @@ public record MineGameStartMenu(
         return new MineGameStartMenu(
                 LEVEL_MENU_NAME,
                 Messages.load("game.mine.start.level.note", locale).formatted(message.getFrom().getUserName(),TelegramBotGame.version),
+                Type.HTML,
                 locale,
                 List.of(
                         List.of(

@@ -91,7 +91,7 @@ public class TelegramBotMineGameCallbackQueryHandler implements CallbackQueryHan
             var query = command.callbackQuery();
             if (game == null) {
                 var message = query.getMessage();
-                client.executeAsync(
+                client.execute(
                         EditMessageReplyMarkup.builder()
                                 .chatId(message.getChatId())
                                 .messageId(message.getMessageId())

@@ -30,7 +30,7 @@ public class HelpCommandHandler implements CommandHandler {
     @Override
     public void handle(Message message, Chat chat, User from, String[] args) {
         try {
-            client.executeAsync(SendMessage.builder()
+            client.execute(SendMessage.builder()
                     .chatId(chat.getId())
                     .messageThreadId(message.getMessageThreadId())
                     .text(Messages.load("game.help", LocaleUtils.fromString(from.getLanguageCode()))

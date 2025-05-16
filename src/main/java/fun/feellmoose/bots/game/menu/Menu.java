@@ -1,7 +1,9 @@
 package fun.feellmoose.bots.game.menu;
 
 import fun.feellmoose.bots.command.menu.TelegramBotMenuCallbackQueryCommand;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +26,24 @@ public interface Menu {
 
     String message();
 
+    Type type();
+
     Locale locale();
 
     List<List<Button>> rows();
+
+    @Getter
+    enum Type{
+        TEXT(null),
+        MARKDOWN("Markdown"),
+        V2MARKDOWN("MarkdownV2"),
+        HTML("HTML"),;
+        @Nullable
+        private final String mode;
+        Type(@Nullable String mode) {
+            this.mode = mode;
+        }
+    }
 
     default void display(TelegramClient client, Long chatID, Integer topicID) throws TelegramApiException {
         var rows = this.rows().stream()
@@ -38,6 +55,7 @@ public interface Menu {
                 ).toList();
         client.execute(SendMessage.builder()
                 .text(this.message())
+                .parseMode(this.type().getMode())
                 .chatId(chatID)
                 .messageThreadId(topicID)
                 .replyMarkup(
@@ -63,6 +81,7 @@ public interface Menu {
                         .chatId(query.getMessage().getChatId())
                         .messageId(query.getMessage().getMessageId())
                         .text(this.message())
+                        .parseMode(this.type().getMode())
                         .build());
                 client.execute(EditMessageReplyMarkup.builder()
                         .chatId(query.getMessage().getChatId())
@@ -88,6 +107,7 @@ public interface Menu {
                 ).toList();
         client.execute(SendMessage.builder()
                 .text(this.message())
+                .parseMode(this.type().getMode())
                 .chatId(message.getChatId())
                 .messageThreadId(message.getMessageThreadId())
                 .replyMarkup(

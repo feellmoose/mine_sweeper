@@ -612,7 +612,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
         var message = query.getMessage();
 
         if (this.win()) {
-            client.executeAsync(
+            client.execute(
                     EditMessageText.builder()
                             .chatId(message.getChatId())
                             .messageId(message.getMessageId())
@@ -625,7 +625,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                                     this.mines()
                             )).build()
             );
-            client.executeAsync(
+            client.execute(
                     EditMessageReplyMarkup.builder()
                             .chatId(message.getChatId())
                             .messageId(message.getMessageId())

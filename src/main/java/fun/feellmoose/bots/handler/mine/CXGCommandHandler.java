@@ -58,7 +58,7 @@ public class CXGCommandHandler implements CommandHandler {
                             ).build()
             );
             try {
-                client.executeAsync(
+                client.execute(
                         SendMessage.builder()
                                 .chatId(chatID)
                                 .messageThreadId(threadID)
@@ -90,7 +90,7 @@ public class CXGCommandHandler implements CommandHandler {
                             .build()
             );
             try {
-                client.executeAsync(
+                client.execute(
                         SendMessage.builder()
                                 .chatId(chatID)
                                 .messageThreadId(threadID)
