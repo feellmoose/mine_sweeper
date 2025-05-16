@@ -1,6 +1,7 @@
 package fun.feellmoose.bots.handler;
 
 import fun.feellmoose.bots.TelegramBotGame;
+import fun.feellmoose.bots.game.menu.Menu;
 import fun.feellmoose.i18n.Messages;
 import fun.feellmoose.utils.LocaleUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class HelpCommandHandler implements CommandHandler {
                     .messageThreadId(message.getMessageThreadId())
                     .text(Messages.load("game.help", LocaleUtils.fromString(from.getLanguageCode()))
                             .formatted(from.getUserName(), TelegramBotGame.version, TelegramBotGame.updateAt.format(DateTimeFormatter.ISO_DATE_TIME)))
+                    .parseMode(Menu.Type.V2MARKDOWN.getMode())
                     .build());
         } catch (TelegramApiException e) {
             log.error("Error while sending message to Mine Sweeper Bot", e);
