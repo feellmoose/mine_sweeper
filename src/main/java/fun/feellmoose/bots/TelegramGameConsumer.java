@@ -26,7 +26,7 @@ public class TelegramGameConsumer implements LongPollingUpdateConsumer {
     private final Collection<CommandHandler> commands;
     private final Collection<CallbackQueryHandler> callbacks;
     private final Collection<ChatHandler> chats;
-    private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    private final ExecutorService executor = Executors.newFixedThreadPool(10);
 
     @Override
     public void consume(List<Update> list) {
