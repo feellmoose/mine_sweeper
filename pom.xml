@@ -24,10 +24,9 @@
 
         <dependency>
             <groupId>org.telegram</groupId>
-            <artifactId>telegrambots-longpolling</artifactId>
+            <artifactId>telegrambots-webhook</artifactId>
             <version>8.3.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>

@@ -1,17 +1,12 @@
 package fun.feellmoose.bots;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fun.feellmoose.bots.handler.CallbackQueryHandler;
 import fun.feellmoose.bots.handler.ChatHandler;
 import fun.feellmoose.bots.handler.CommandHandler;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
-import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
+import org.telegram.telegrambots.webhook.TelegramBotsWebhookApplication;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,22 +16,18 @@ import java.util.Collection;
 public class TelegramBotGame {
     public static final String version = "v0.1.0";
     public static final LocalDateTime updateAt = LocalDateTime.now();
-    private final String botToken;
-    @Getter
-    private final TelegramBotsLongPollingApplication application;
-    private final TelegramGameConsumer gameConsumer;
+    private final TelegramBotsWebhookApplication application;
 
 
     private TelegramBotGame(
             @NotNull String botToken,
-            @NotNull OkHttpClient httpClient,
             Collection<CommandHandler> commands,
             Collection<CallbackQueryHandler> callbacks,
             Collection<ChatHandler> chats
-    ) {
-        this.botToken = botToken;
-        this.gameConsumer = new TelegramGameConsumer(commands, callbacks, chats);
-        this.application = new TelegramBotsLongPollingApplication(ObjectMapper::new, () -> httpClient);
+    ) throws TelegramApiException {
+        var application = new TelegramBotsWebhookApplication();
+        application.registerBot(new MineGameTelegramWebhookBot(botToken, commands, callbacks, chats));
+        this.application = application;
     }
 
     public static TelegramBotGameBuilder builder() {
@@ -45,7 +36,6 @@ public class TelegramBotGame {
 
     public static class TelegramBotGameBuilder {
         private String botToken;
-        private OkHttpClient client;
         private final Collection<CommandHandler> commands = new ArrayList<>();
         private final Collection<CallbackQueryHandler> callbacks = new ArrayList<>();
         private final Collection<ChatHandler> chats = new ArrayList<>();
@@ -53,11 +43,10 @@ public class TelegramBotGame {
         private TelegramBotGameBuilder() {
         }
 
-        public TelegramBotGame build() {
-            OkHttpClient client = this.client != null ? this.client : new OkHttpClient();
+        public TelegramBotGame build() throws TelegramApiException {
             String botToken = this.botToken != null ? this.botToken : System.getenv("BOT_TOKEN");
             return new TelegramBotGame(
-                    botToken, client, commands, callbacks, chats
+                    botToken, commands, callbacks, chats
             );
         }
 
@@ -96,17 +85,13 @@ public class TelegramBotGame {
             return this;
         }
 
-        public TelegramBotGameBuilder client(OkHttpClient client) {
-            this.client = client;
-            return this;
-        }
     }
 
     public void start() throws TelegramApiException {
-        var app = this.application;
-        app.registerBot(botToken, gameConsumer);
-        if (!app.isRunning()) {
-            app.start();
+        synchronized (this.application) {
+            if (!this.application.isRunning()) {
+                this.application.start();
+            }
         }
     }
 }

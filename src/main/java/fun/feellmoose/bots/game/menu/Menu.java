@@ -2,11 +2,10 @@ package fun.feellmoose.bots.game.menu;
 
 import fun.feellmoose.bots.command.menu.TelegramBotMenuCallbackQueryCommand;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -33,13 +32,15 @@ public interface Menu {
     List<List<Button>> rows();
 
     @Getter
-    enum Type{
+    enum Type {
         TEXT(null),
-        MARKDOWN("Markdown"),
-        V2MARKDOWN("MarkdownV2"),
-        HTML("HTML"),;
+        MARKDOWN(ParseMode.MARKDOWN),
+        V2MARKDOWN(ParseMode.MARKDOWNV2),
+        HTML(ParseMode.HTML),
+        ;
         @Nullable
         private final String mode;
+
         Type(@Nullable String mode) {
             this.mode = mode;
         }
@@ -48,9 +49,9 @@ public interface Menu {
     default void display(TelegramClient client, Long chatID, Integer topicID) throws TelegramApiException {
         var rows = this.rows().stream()
                 .map(list -> new InlineKeyboardRow(
-                        list.stream()
-                                .map(button -> button.toKeyboardButton(locale()))
-                                .toList()
+                                list.stream()
+                                        .map(button -> button.toKeyboardButton(locale()))
+                                        .toList()
                         )
                 ).toList();
         client.execute(SendMessage.builder()
@@ -93,7 +94,8 @@ public interface Menu {
                         .build());
             }
             case create -> display(client, query.getMessage().getChatId(), data.topicID());
-            case none -> {}
+            case none -> {
+            }
         }
     }
 

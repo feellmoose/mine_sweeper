@@ -15,10 +15,11 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public class GameStart {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws TelegramApiException {
         Logger log = LoggerFactory.getLogger(GameStart.class);
         log.info("Prepare resource..");
         String botToken = System.getenv("BOT_TOKEN");
+        botToken = botToken == null ? "" : botToken;
         log.info("Loaded telegram bot token: [{}]", botToken);
 
         OkHttpClient client = new OkHttpClient();
@@ -29,7 +30,6 @@ public class GameStart {
 
         TelegramBotGame game = TelegramBotGame.builder()
                 .botToken(botToken)
-                .client(client)
                 .register(new TelegramBotMineGameCallbackQueryHandler(app, telegramClient))
                 .register(new TelegramBotMenuCallbackQueryHandler(telegramClient))
                 .register(new MineCommandHandler(telegramClient))
