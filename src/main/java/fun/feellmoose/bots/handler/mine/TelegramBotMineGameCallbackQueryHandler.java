@@ -1,27 +1,22 @@
 package fun.feellmoose.bots.handler.mine;
 
 import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryCommand;
-import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
 import fun.feellmoose.bots.game.mine.BotMineGame;
 import fun.feellmoose.bots.game.mine.TelegramBotMineGame;
 import fun.feellmoose.bots.game.mine.TelegramBotMineGameApp;
-import fun.feellmoose.game.mine.core.GameException;
 import fun.feellmoose.bots.handler.CallbackQueryHandler;
+import fun.feellmoose.exception.GameException;
 import fun.feellmoose.i18n.Messages;
 import fun.feellmoose.utils.LocaleUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

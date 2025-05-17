@@ -3,7 +3,7 @@ package fun.feellmoose.bots.game.mine;
 import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryCommand;
 import fun.feellmoose.bots.command.mine.TelegramBotMineGameCallbackQueryData;
 import fun.feellmoose.bots.game.GenID;
-import fun.feellmoose.game.mine.core.GameException;
+import fun.feellmoose.exception.GameException;
 import fun.feellmoose.i18n.Messages;
 import fun.feellmoose.repo.Repo;
 import lombok.AllArgsConstructor;

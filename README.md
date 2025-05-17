@@ -1,2 +1,2 @@
-# mine_sweeper
-A Nanjing University of Posts and Telecommunications Software Engineering Experiment
+# A Telegram game bot
+A bot @mine_sweeper_plus_bot

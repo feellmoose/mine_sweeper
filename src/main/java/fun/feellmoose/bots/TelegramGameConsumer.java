@@ -22,7 +22,6 @@ import java.util.concurrent.Executors;
 @Slf4j
 @AllArgsConstructor
 public class TelegramGameConsumer implements LongPollingUpdateConsumer {
-    private final TelegramClient client;
     private final Collection<CommandHandler> commands;
     private final Collection<CallbackQueryHandler> callbacks;
     private final Collection<ChatHandler> chats;

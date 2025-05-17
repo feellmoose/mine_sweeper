@@ -2,7 +2,7 @@ package fun.feellmoose.bots.game.mine;
 
 
 import fun.feellmoose.bots.game.GenID;
-import fun.feellmoose.game.mine.core.GameException;
+import fun.feellmoose.exception.GameException;
 import fun.feellmoose.repo.Repo;
 import fun.feellmoose.utils.LocaleUtils;
 import org.jetbrains.annotations.NotNull;

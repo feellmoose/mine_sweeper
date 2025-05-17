@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fun.feellmoose</groupId>
-    <artifactId>mine-sweeper</artifactId>
+    <artifactId>mine-sweeper-bot</artifactId>
     <version>1.0.0</version>
 
     <properties>
@@ -65,7 +65,7 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <Main-Class>fun.feellmoose.Main</Main-Class>
+                                    <Main-Class>fun.feellmoose.GameStart</Main-Class>
                                 </transformer>
                             </transformers>
                         </configuration>
