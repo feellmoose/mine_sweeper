@@ -19,8 +19,7 @@ public class GameStart {
         Logger log = LoggerFactory.getLogger(GameStart.class);
         log.info("Prepare resource..");
         String botToken = System.getenv("BOT_TOKEN");
-
-        log.debug("Loaded telegram bot token: [{}]", botToken);
+        log.info("Loaded telegram bot token: [{}]", botToken);
 
         OkHttpClient client = new OkHttpClient();
         TelegramClient telegramClient = new OkHttpTelegramClient(client, botToken);
