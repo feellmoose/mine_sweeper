@@ -22,22 +22,23 @@ public class GameStart {
         botToken = botToken == null ? "" : botToken;
         log.info("Loaded telegram bot token: [{}]", botToken);
 
-        OkHttpClient client = new OkHttpClient();
-        TelegramClient telegramClient = new OkHttpTelegramClient(client, botToken);
+        TelegramClient client = new OkHttpTelegramClient(new OkHttpClient(), botToken);
         TelegramBotMineGameApp app = new TelegramBotMineGameApp(new MemoryRepo<>());
 
         log.info("Starting TelegramBot Game..");
 
         TelegramBotGame game = TelegramBotGame.builder()
                 .botToken(botToken)
-                .register(new TelegramBotMineGameCallbackQueryHandler(app, telegramClient))
-                .register(new TelegramBotMenuCallbackQueryHandler(telegramClient))
-                .register(new MineCommandHandler(telegramClient))
-                .register(new MineLevelCommandHandler(telegramClient))
-                .register(new MineRandomCommandHandler(telegramClient))
-                .register(new HelpCommandHandler(telegramClient))
-                .register(new CXGCommandHandler(telegramClient))
+                .client(client)
+                .register(new TelegramBotMineGameCallbackQueryHandler(app, client))
+                .register(new TelegramBotMenuCallbackQueryHandler(client))
+                .register(new MineCommandHandler(client))
+                .register(new MineLevelCommandHandler(client))
+                .register(new MineRandomCommandHandler(client))
+                .register(new HelpCommandHandler(client))
+                .register(new CXGCommandHandler(client))
                 .build();
+
         try {
             game.start();
             log.info("TelegramBot Game started successfully!");
