@@ -5,6 +5,7 @@ import fun.feellmoose.bots.game.mine.TelegramBotMineGameApp;
 import fun.feellmoose.bots.handler.HelpCommandHandler;
 import fun.feellmoose.bots.handler.menu.TelegramBotMenuCallbackQueryHandler;
 import fun.feellmoose.bots.handler.mine.*;
+import fun.feellmoose.bots.handler.roll.RollCommandHandler;
 import fun.feellmoose.repo.MemoryRepo;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public class GameStart {
                 .register(new MineRandomCommandHandler(client))
                 .register(new HelpCommandHandler(client))
                 .register(new CXGCommandHandler(client))
+                .register(new RollCommandHandler(client))
                 .build();
 
         try {
