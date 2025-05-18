@@ -28,53 +28,49 @@ public class RollCommandHandler implements CommandHandler {
     @Override
     public void handle(Message message, Chat chat, User from, String[] args) {
         switch (args.length) {
-            case 1 -> {
-                int random = ThreadLocalRandom.current().nextInt(10);
-                try {
-                    client.executeAsync(SendMessage.builder()
-                            .chatId(chat.getId())
-                            .messageThreadId(message.getMessageThreadId())
-                            .text(String.valueOf(random))
-                            .replyToMessageId(message.getMessageId())
-                            .build());
-                } catch (TelegramApiException e) {
-                    log.error("Error while sending message to Mine Sweeper Bot", e);
-                }
-            }
-            case 2 -> {
-                long max = Long.parseLong(args[1]) + 1;
-                long random;
-                if (max > 0) random = ThreadLocalRandom.current().nextLong(max);
-                else random = 0;
-                try {
-                    client.executeAsync(SendMessage.builder()
-                            .chatId(chat.getId())
-                            .messageThreadId(message.getMessageThreadId())
-                            .text(String.valueOf(random))
-                            .replyToMessageId(message.getMessageId())
-                            .build());
-                } catch (TelegramApiException e) {
-                    log.error("Error while sending message to Mine Sweeper Bot", e);
-                }
-            }
             case 3 -> {
-                long max = Long.parseLong(args[2]) + 1;
-                long min = Long.parseLong(args[1]);
+                long max;
+                long min;
                 long random;
-                if (max > min) random = ThreadLocalRandom.current().nextLong(min, max);
-                else random = min;
                 try {
+                    max = Long.parseLong(args[2]);
+                    min = Long.parseLong(args[1]);
+                    if (max> min) random = ThreadLocalRandom.current().nextLong(min, max + 1);
+                    else random = min;
                     client.executeAsync(SendMessage.builder()
                             .chatId(chat.getId())
                             .messageThreadId(message.getMessageThreadId())
-                            .text(String.valueOf(random))
+                            .text("""
+                                    Random num from %d to %d is %d
+                                    """.formatted(min,max,random))
                             .replyToMessageId(message.getMessageId())
                             .build());
+                } catch (NumberFormatException e) {
+                    try {
+                        client.executeAsync(SendMessage.builder()
+                                .chatId(chat.getId())
+                                .messageThreadId(message.getMessageThreadId())
+                                .text("Usage: /roll <min(inclusive)> <max(inclusive)>" )
+                                .replyToMessageId(message.getMessageId())
+                                .build());
+                    } catch (TelegramApiException ex) {
+                        log.error("Error while sending message to Mine Sweeper Bot", ex);
+                    }
                 } catch (TelegramApiException e) {
                     log.error("Error while sending message to Mine Sweeper Bot", e);
                 }
             }
             default -> {
+                try {
+                    client.executeAsync(SendMessage.builder()
+                            .chatId(chat.getId())
+                            .messageThreadId(message.getMessageThreadId())
+                            .text("Usage: /roll <min(inclusive)> <max(inclusive)>" )
+                            .replyToMessageId(message.getMessageId())
+                            .build());
+                } catch (TelegramApiException e) {
+                    log.error("Error while sending message to Mine Sweeper Bot", e);
+                }
             }
         }
 
