@@ -41,8 +41,9 @@ public class RollCommandHandler implements CommandHandler {
                             .chatId(chat.getId())
                             .messageThreadId(message.getMessageThreadId())
                             .text("""
-                                    Random num from %d to %d is %d
-                                    """.formatted(min,max,random))
+                                    Random num is %d.
+                                    (From %d(inclusive) to %d(inclusive))
+                                    """.formatted(random,min,max))
                             .replyToMessageId(message.getMessageId())
                             .build());
                 } catch (NumberFormatException e) {
