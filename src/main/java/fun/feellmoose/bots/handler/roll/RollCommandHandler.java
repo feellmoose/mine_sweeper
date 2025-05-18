@@ -44,7 +44,7 @@ public class RollCommandHandler implements CommandHandler {
             case 2 -> {
                 long max = Long.parseLong(args[1]) + 1;
                 long random;
-                if (max > 0) random = ThreadLocalRandom.current().nextLong(max + 1);
+                if (max > 0) random = ThreadLocalRandom.current().nextLong(max);
                 else random = 0;
                 try {
                     client.executeAsync(SendMessage.builder()
@@ -61,7 +61,7 @@ public class RollCommandHandler implements CommandHandler {
                 long max = Long.parseLong(args[2]) + 1;
                 long min = Long.parseLong(args[1]);
                 long random;
-                if (max > min) random = ThreadLocalRandom.current().nextLong(min, max + 1);
+                if (max > min) random = ThreadLocalRandom.current().nextLong(min, max);
                 else random = min;
                 try {
                     client.executeAsync(SendMessage.builder()
