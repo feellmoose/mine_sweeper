@@ -324,6 +324,7 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
             if (status == BotMineGame.GameStatus.UnInit) return this;
             LocalDateTime nUpdate;
             History[] current;
+            int step = 0;
             if (history.length > s) {
                 current = new History[history.length - s];
                 System.arraycopy(history, 0, current, 0, history.length - s);
@@ -348,9 +349,11 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                         nBoxes[position.x()][position.y()] = box.flagged();
                     }
                     case Click -> {
+                        step ++;
                         Box box = nBoxes[position.x()][position.y()];
                         nBoxes[position.x()][position.y()] = Box.num(box.num());
                         if (rollback.related() != null) {
+                            step += rollback.related().length;
                             for (History h : rollback.related()) {
                                 Position related = h.position();
                                 Box b = nBoxes[related.x()][related.y()];
@@ -358,13 +361,16 @@ public class TelegramBotMineGame implements BotMineGame<TelegramBotMineGame>, Bo
                             }
                         }
                     }
-                    case Boom -> nBoxes[position.x()][position.y()] = Box.mine();
+                    case Boom -> {
+                        step ++;
+                        nBoxes[position.x()][position.y()] = Box.mine();
+                    }
                 }
             }
 
             return new TelegramBotMineGame(
                     new SerializedTelegramBotGame(
-                            id, userID, infos, steps, mines, width, height, nBoxes, current, false, GameStatus.Running, create, nUpdate, start, null
+                            id, userID, infos, steps - step, mines, width, height, nBoxes, current, false, GameStatus.Running, create, nUpdate, start, null
                     )
             );
         }
